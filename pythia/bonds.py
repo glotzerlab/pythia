@@ -1,0 +1,109 @@
+import numpy as np
+import freud
+
+def _nlist_nn_helper(fbox, positions, neighbors, rmax_guess, exclude_ii=None):
+    if isinstance(neighbors, int):
+        nneigh = freud.locality.NearestNeighbors(rmax_guess, neighbors)
+        nneigh.compute(fbox, positions, positions, exclude_ii)
+        neighbors = nneigh.nlist
+
+    return neighbors
+
+def normalized_radial_distance(box, positions, neighbors, rmax_guess=2.):
+    """Returns the ratio of the euclidean distance of each near-neighbor
+    to that of the nearest neighbor for each particle"""
+    fbox = freud.box.Box.from_box(box)
+
+    neighbors = _nlist_nn_helper(fbox, positions, neighbors, rmax_guess, True)
+
+    rijs = positions[neighbors.index_j] - positions[neighbors.index_i]
+    fbox.wrap(rijs)
+
+    rs = np.linalg.norm(rijs, axis=-1)
+    reference_rs = rs[neighbors.segments]
+    normalization = np.repeat(reference_rs, neighbors.neighbor_counts)
+    rs /= normalization
+
+    # skip the shortest bond since that gets normalized down to 1
+    return rs.reshape((positions.shape[0], -1))[:, 1:]
+
+def neighborhood_distance_singvals(box, positions, neighbors, rmax_guess=2.):
+    """Construct a matrix of pairwise distances filled with |r_k - r_j|
+    for all neighbors j and k(==j) of each particle i. Returns the
+    singular values of this matrix to fix permutation invariance.
+    """
+    fbox = freud.box.Box.from_box(box)
+
+    neighbors = _nlist_nn_helper(fbox, positions, neighbors, rmax_guess, True)
+
+    neighbor_indices = neighbors.index_j.reshape((positions.shape[0], -1))
+
+    # (Np, Nn, Nn, 3) distance matrix
+    rijs = positions[neighbor_indices[:, :, np.newaxis]] - positions[neighbor_indices[:, np.newaxis, :]]
+    fbox.wrap(rijs.reshape((-1, 3)))
+
+    # (Np, Nn, Nn) distance matrix
+    rs = np.linalg.norm(rijs, axis=-1)
+    # (0, 0) should be ri - ri == 0; (1, 0) should be the actual
+    # nearest neighbor distance
+    normalization = rs[:, 1, 0]
+    rs /= normalization[:, np.newaxis, np.newaxis]
+
+    svals = np.linalg.svd(rs, compute_uv=False)
+    return svals
+
+def neighborhood_range_distance_singvals(box, positions, neigh_min, neigh_max, rmax_guess=2.):
+    """Construct a matrix of pairwise distances filled with |r_k - r_j|
+    for all neighbors j and k(==j) of each particle i, for a range of
+    neighborhood sizes from neigh_min to neigh_max
+    (inclusive). Returns the singular values of this matrix to fix
+    permutation invariance.
+    """
+    result = []
+
+    for neighbors in range(neigh_min, neigh_max + 1):
+        result.append(neighborhood_distance_singvals(box, positions, neighbors, rmax_guess))
+
+    return np.hstack(result)
+
+def neighborhood_angle_singvals(box, positions, neighbors, rmax_guess=2.):
+    """Construct a matrix of pairwise angles between (rk - ri) and (rj -
+    ri) for all neighbors j and k(==j) of each particle i, for a
+    particular number of neighbors. Returns the singular values of
+    this matrix to fix permutation invariance.
+    """
+    fbox = freud.box.Box.from_box(box)
+
+    neighbors = _nlist_nn_helper(fbox, positions, neighbors, rmax_guess)
+
+    neighbor_indices = neighbors.index_j.reshape((positions.shape[0], -1))
+
+    # (Np, Nn, 3) distance matrix
+    rijs = positions[neighbor_indices] - positions[:, np.newaxis, :]
+    fbox.wrap(rijs.reshape((-1, 3)))
+
+    # (Np, Nn) distances
+    rs = np.linalg.norm(rijs, axis=-1)
+    rijs /= rs[:, :, np.newaxis]
+
+    # (Np, Nn, Nn) dot products of distances
+    dots = np.sum(rijs[:, :, np.newaxis]*rijs[:, np.newaxis, :], axis=-1)
+    thetas = np.arccos(dots)
+    thetas[np.isnan(thetas)] = 0
+
+    svals = np.linalg.svd(thetas, compute_uv=False)
+    return svals
+
+def neighborhood_range_angle_singvals(box, positions, neigh_min, neigh_max, rmax_guess=2.):
+    """Construct a matrix of pairwise angles between (rk - ri) and (rj -
+    ri) for all neighbors j and k(==j) of each particle i, for a range
+    of neighborhood sizes from neigh_min to neigh_max
+    (inclusive). Returns the singular values of this matrix to fix
+    permutation invariance.
+    """
+    result = []
+
+    for neighbors in range(neigh_min, neigh_max + 1):
+        result.append(neighborhood_angle_singvals(box, positions, neighbors, rmax_guess))
+
+    return np.hstack(result)
