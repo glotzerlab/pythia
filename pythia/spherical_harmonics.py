@@ -61,7 +61,6 @@ def neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
         sphs = np.nanmean(sphs, axis=1)
         result.append(sphs)
 
-        result.append(sphs)
     return np.hstack(result)
 
 def abs_neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
