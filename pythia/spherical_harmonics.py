@@ -23,7 +23,8 @@ def _nlist_helper(fbox, positions, neighbors, rmax_guess=2., exclude_ii=None):
 
 def neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
                      negative_m=True, reference_frame='neighborhood',
-                     orientations=None, rmax_guess=1.):
+                     orientations=None, rmax_guess=1., noise_samples=0,
+                     noise_magnitude=0):
     """Compute the neighbor-averaged spherical harmonics over the
     nearest-neighbor bonds of a set of particles. Returns the raw
     (complex) spherical harmonic values.
@@ -35,8 +36,21 @@ def neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
     :param reference_frame: 'neighborhood': use diagonal inertia tensor reference frame; 'particle_local': use the given orientations array; 'global': do not rotate
     :param orientations: Per-particle orientations, only used when reference_frame == 'particle_local'
     :param rmax_guess: Initial guess of the distance to find `neigh_max` nearest neighbors. Only affects algorithm speed.
+    :param noise_samples: Number of random noisy samples of positions to average the result over (disabled if 0)
+    :param noise_magnitude: Magnitude of (normally-distributed) noise to apply to noise_samples different positions (disabled if `noise_samples == 0`)
 
     """
+    if noise_samples:
+        to_average = []
+        for _ in range(noise_samples):
+            noise = np.random.normal(0, noise_magnitude, positions.shape)
+            noisy_positions = positions + noise
+            to_average.append(neighbor_average(
+                box, positions, neigh_min, neigh_max, lmax, negative_m,
+                reference_frame, orientations, rmax_guess, 0, 0))
+
+        return np.mean(to_average, axis=0)
+
     box = freud.box.Box.from_box(box)
 
     if orientations is None and reference_frame == 'particle_local':
@@ -65,7 +79,8 @@ def neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
 
 def abs_neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
                      negative_m=True, reference_frame='neighborhood',
-                     orientations=None, rmax_guess=1.):
+                     orientations=None, rmax_guess=1., noise_samples=0,
+                     noise_magnitude=0):
     """Compute the neighbor-averaged spherical harmonics over the
     nearest-neighbor bonds of a set of particles. Returns the absolute
     value of the (complex) spherical harmonics
@@ -77,6 +92,8 @@ def abs_neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
     :param reference_frame: 'neighborhood': use diagonal inertia tensor reference frame; 'particle_local': use the given orientations array; 'global': do not rotate
     :param orientations: Per-particle orientations, only used when reference_frame == 'particle_local'
     :param rmax_guess: Initial guess of the distance to find `neigh_max` nearest neighbors. Only affects algorithm speed.
+    :param noise_samples: Number of random noisy samples of positions to average the result over (disabled if 0)
+    :param noise_magnitude: Magnitude of (normally-distributed) noise to apply to noise_samples different positions (disabled if `noise_samples == 0`)
 
     """
 
@@ -86,7 +103,8 @@ def abs_neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
 
 def system_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
                    negative_m=True, reference_frame='neighborhood',
-                   orientations=None, rmax_guess=1.):
+                   orientations=None, rmax_guess=1., noise_samples=0,
+                   noise_magnitude=0):
     """Compute the global-averaged spherical harmonics over the
     nearest-neighbor bonds of a set of particles. Returns the raw
     (complex) spherical harmonic values.
@@ -98,6 +116,8 @@ def system_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
     :param reference_frame: 'neighborhood': use diagonal inertia tensor reference frame; 'particle_local': use the given orientations array; 'global': do not rotate
     :param orientations: Per-particle orientations, only used when reference_frame == 'particle_local'
     :param rmax_guess: Initial guess of the distance to find `neigh_max` nearest neighbors. Only affects algorithm speed.
+    :param noise_samples: Number of random noisy samples of positions to average the result over (disabled if 0)
+    :param noise_magnitude: Magnitude of (normally-distributed) noise to apply to noise_samples different positions (disabled if `noise_samples == 0`)
 
     """
     return np.mean(neighbor_average(
@@ -106,7 +126,8 @@ def system_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
 
 def abs_system_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
                        negative_m=True, reference_frame='neighborhood',
-                       orientations=None, rmax_guess=1.):
+                       orientations=None, rmax_guess=1., noise_samples=0,
+                       noise_magnitude=0):
     """Compute the global-averaged spherical harmonics over the
     nearest-neighbor bonds of a set of particles. Returns the absolute
     value of the (complex) spherical harmonics
@@ -118,6 +139,8 @@ def abs_system_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
     :param reference_frame: 'neighborhood': use diagonal inertia tensor reference frame; 'particle_local': use the given orientations array; 'global': do not rotate
     :param orientations: Per-particle orientations, only used when reference_frame == 'particle_local'
     :param rmax_guess: Initial guess of the distance to find `neigh_max` nearest neighbors. Only affects algorithm speed.
+    :param noise_samples: Number of random noisy samples of positions to average the result over (disabled if 0)
+    :param noise_magnitude: Magnitude of (normally-distributed) noise to apply to noise_samples different positions (disabled if `noise_samples == 0`)
 
     """
     return np.abs(system_average(
