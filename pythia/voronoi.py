@@ -61,7 +61,7 @@ def angle_histogram(box, positions, bins, buffer_distance=None, area_weight_mode
     :param buffer_distance: Distance to copy parts of the simulation box for periodic boundary conditions in the voronoi diagram computation
     :param area_weight_mode: Whether the weight for each pair of faces should be the sum ('sum') or product ('product') of the face areas
     """
-    internal.assert_installed(scipy, 'scipy')
+    scipy = internal.assert_installed('scipy')
 
     if buffer_distance is None:
         buffer_distance = min(box.Lx, box.Ly, box.Lz)*.5
