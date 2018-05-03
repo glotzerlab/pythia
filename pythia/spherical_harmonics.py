@@ -168,6 +168,7 @@ class _clebsch_gordan_cache(object):
 
     def __call__(self, l1, l2, l3, m1, m2, m3):
         sympy = assert_installed('sympy')
+        assert_installed('sympy.physics.wigner')
         key = (l1, l2, l3, m1, m2, m3)
 
         if key not in self._cache:
