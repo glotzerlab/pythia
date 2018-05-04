@@ -4,10 +4,9 @@ import logging
 import numpy as np
 import freud
 
-from .internal import assert_installed
+from .internal import assert_installed, cite
 
 logger = logging.getLogger(__name__)
-
 
 def _nlist_helper(fbox, positions, neighbors, rmax_guess=2., exclude_ii=None):
     if isinstance(neighbors, int):
@@ -21,6 +20,7 @@ def _nlist_helper(fbox, positions, neighbors, rmax_guess=2., exclude_ii=None):
 
     return neighbors
 
+@cite('freud2016', 'spellings2018')
 def neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
                      negative_m=True, reference_frame='neighborhood',
                      orientations=None, rmax_guess=1., noise_samples=0,
@@ -77,6 +77,7 @@ def neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
 
     return np.hstack(result)
 
+@cite('freud2016', 'spellings2018')
 def abs_neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
                      negative_m=True, reference_frame='neighborhood',
                      orientations=None, rmax_guess=1., noise_samples=0,
@@ -101,6 +102,7 @@ def abs_neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
         box, positions, neigh_min, neigh_max, lmax, negative_m,
         reference_frame, orientations, rmax_guess))
 
+@cite('freud2016', 'spellings2018')
 def system_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
                    negative_m=True, reference_frame='neighborhood',
                    orientations=None, rmax_guess=1., noise_samples=0,
@@ -124,6 +126,7 @@ def system_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
         box, positions, neigh_min, neigh_max, lmax, negative_m,
         reference_frame, orientations, rmax_guess), axis=0)
 
+@cite('freud2016', 'spellings2018')
 def abs_system_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
                        negative_m=True, reference_frame='neighborhood',
                        orientations=None, rmax_guess=1., noise_samples=0,
@@ -147,6 +150,7 @@ def abs_system_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
         box, positions, neigh_min, neigh_max, lmax, negative_m,
         reference_frame, orientations, rmax_guess))
 
+@cite('freud2016')
 def steinhardt_q(box, positions, neighbors=12, lmax=6, rmax_guess=2.):
     """Compute a vector of per-particle Steinhardt order parameters, which
     are rotationally-invariant combinations of spherical harmonics."""
@@ -176,6 +180,7 @@ class _clebsch_gordan_cache(object):
 
         return self._cache[key]
 
+@cite('kondor2007', 'freud2016')
 def bispectrum(box, positions, neighbors, lmax, rmax_guess=2.):
     """Computes bispectrum invariants of particle local
     environments. These are rotationally-invariant descriptions

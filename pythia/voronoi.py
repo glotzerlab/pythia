@@ -2,15 +2,7 @@ import logging
 import numpy as np
 import freud
 
-logger = logging.getLogger(__name__)
-
-try:
-    import scipy as sp, scipy.spatial
-except ImportError:
-    scipy = None
-    logger.warning('scipy not installed, angle_histogram will fail')
-
-from . import internal
+from .internal import assert_installed, cite
 
 def _angle_histogram_3d(vertices, bins=16, area_weight_mode='product'):
     hull = sp.spatial.ConvexHull(vertices)
@@ -52,6 +44,7 @@ def _angle_histogram_3d(vertices, bins=16, area_weight_mode='product'):
 
     return result/np.sum(area_weights)
 
+@cite('freud2016')
 def angle_histogram(box, positions, bins, buffer_distance=None, area_weight_mode='product'):
     """Compute the area-weighted (a_i + a_j) angle histogram of all pairs
     of faces for the voronoi polyhedron of each particle. Sums the areas
@@ -61,7 +54,7 @@ def angle_histogram(box, positions, bins, buffer_distance=None, area_weight_mode
     :param buffer_distance: Distance to copy parts of the simulation box for periodic boundary conditions in the voronoi diagram computation
     :param area_weight_mode: Whether the weight for each pair of faces should be the sum ('sum') or product ('product') of the face areas
     """
-    scipy = internal.assert_installed('scipy')
+    scipy = assert_installed('scipy')
 
     if buffer_distance is None:
         buffer_distance = min(box.Lx, box.Ly, box.Lz)*.5
