@@ -39,6 +39,9 @@ The documentation is available as standard sphinx documentation::
   $ cd doc
   $ make html
 
+Automatically-built documentation is available at
+https://pythia-learn.readthedocs.io .
+
 Contents:
 =========
 
