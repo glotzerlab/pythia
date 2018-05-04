@@ -3,7 +3,7 @@ Welcome to pythia's documentation!
 ==================================
 
 Pythia is a library to generate numerical descriptions of particle
-systems. Most methods rely heavily on `freud`
+systems. Most methods rely heavily on `freud
 <https://bitbucket.org/glotzer/freud>`_ for efficient neighbor search
 and other accelerated calculations.
 

@@ -1,3 +1,8 @@
+"""
+This module computes relatively simple descriptors based on
+nearest-neighbor bonds, with few additional transformations.
+"""
+
 import numpy as np
 import freud
 

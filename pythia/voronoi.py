@@ -1,3 +1,8 @@
+"""
+This module computes descriptors based on the Voronoi tessellation
+of the system.
+"""
+
 import logging
 import numpy as np
 import freud

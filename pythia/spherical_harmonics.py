@@ -1,3 +1,8 @@
+"""
+This module computes descriptors based on combinations of
+spherical harmonics applied to nearest-neighbor bonds.
+"""
+
 from collections import defaultdict
 import itertools
 import logging
