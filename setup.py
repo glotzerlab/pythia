@@ -5,7 +5,7 @@ from setuptools import setup
 with open('pythia/version.py') as version_file:
     exec(version_file.read())
 
-setup(name='pythia',
+setup(name='pythia-learn',
       author='Matthew Spellings',
       author_email='mspells@umich.edu',
       classifiers=[
