@@ -42,6 +42,16 @@ The documentation is available as standard sphinx documentation::
 Automatically-built documentation is available at
 https://pythia-learn.readthedocs.io .
 
+Usage
+=====
+
+In general, data types follow the `hoomd-blue schema
+<http://hoomd-blue.readthedocs.io/en/stable/box.html>`_:
+
+- Positions are an Nx3 array of particle coordinates, with `(0, 0, 0)` being the center of the box
+- Boxes are specified as an object with `Lx`, `Ly`, `Lz`, `xy`, `xz`, and `yz` elements
+- Orientations are specified as orientation quaternions: an Nx4 array of `(r, i, j, k)` elements
+
 Examples
 ========
 
