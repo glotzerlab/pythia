@@ -11,7 +11,7 @@ import scipy as sp, scipy.spatial
 
 from .internal import cite
 
-def _angle_histogram_3d(vertices, bins=16, area_weight_mode='product', sp=None):
+def _angle_histogram_3d(vertices, bins=16, area_weight_mode='product'):
     hull = sp.spatial.ConvexHull(vertices)
     dot_products = np.zeros((hull.equations.shape[0], hull.equations.shape[0]), dtype=np.float32)
 
