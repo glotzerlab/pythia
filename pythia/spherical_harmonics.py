@@ -157,8 +157,13 @@ def abs_system_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
 
 @cite('freud2016')
 def steinhardt_q(box, positions, neighbors=12, lmax=6, rmax_guess=2.):
-    """Compute a vector of per-particle Steinhardt order parameters, which
-    are rotationally-invariant combinations of spherical harmonics."""
+    """Compute a vector of per-particle Steinhardt order parameters.
+
+    :param neighbors: Number of neighbors (int) or maximum distance to find neighbors within (float)
+    :param lmax: Maximum spherical harmonic degree l
+    :param rmax_guess: Initial guess of the distance to find nearest neighbors, if appropriate. Only affects algorithm speed.
+
+    """
     box = freud.box.Box.from_box(box)
     neighbors = _nlist_helper(box, positions, neighbors, rmax_guess)
 
