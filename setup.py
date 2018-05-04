@@ -16,7 +16,7 @@ setup(name='pythia-learn',
           'Topic :: Scientific/Engineering :: Physics'
       ],
       description='Machine learning fingerprints for particle environments',
-      install_requires=['numpy', 'scipy', 'freud'],
+      install_requires=['numpy', 'scipy'],
       license='BSD',
       package_dir={'pythia': 'pythia'},
       packages=['pythia'],
