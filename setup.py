@@ -12,5 +12,5 @@ setup(name='pythia',
       author_email='mspells@umich.edu',
       package_dir={'pythia': 'pythia'},
       packages=['pythia'],
-      install_requires=['numpy', 'scipy'],
+      install_requires=['numpy', 'scipy', 'freud'],
       )
