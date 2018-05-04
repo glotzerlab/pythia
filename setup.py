@@ -6,14 +6,23 @@ with open('pythia/version.py') as version_file:
     exec(version_file.read())
 
 setup(name='pythia',
-      version=__version__,
-      description='Machine learning fingerprints for particle environments',
       author='Matthew Spellings',
       author_email='mspells@umich.edu',
       classifiers=[
-          'License :: OSI Approved :: BSD License'
+          'License :: OSI Approved :: BSD License',
+          'Programming Language :: Python :: 3',
+          'Topic :: Scientific/Engineering :: Artificial Intelligence',
+          'Topic :: Scientific/Engineering :: Chemistry',
+          'Topic :: Scientific/Engineering :: Physics'
       ],
+      description='Machine learning fingerprints for particle environments',
+      install_requires=['numpy', 'scipy', 'freud'],
+      license='BSD',
       package_dir={'pythia': 'pythia'},
       packages=['pythia'],
-      install_requires=['numpy', 'scipy', 'freud'],
+      project_urls={
+          'Source': 'https://bitbucket.org/glotzer/pythia'
+      },
+      python_requires='>=3',
+      version=__version__
       )
