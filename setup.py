@@ -10,6 +10,9 @@ setup(name='pythia',
       description='Machine learning fingerprints for particle environments',
       author='Matthew Spellings',
       author_email='mspells@umich.edu',
+      classifiers=[
+          'License :: OSI Approved :: BSD License'
+      ],
       package_dir={'pythia': 'pythia'},
       packages=['pythia'],
       install_requires=['numpy', 'scipy', 'freud'],
