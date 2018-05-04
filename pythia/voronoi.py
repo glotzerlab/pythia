@@ -7,9 +7,11 @@ import logging
 import numpy as np
 import freud
 
-from .internal import assert_installed, cite
+import scipy as sp, scipy.spatial
 
-def _angle_histogram_3d(vertices, bins=16, area_weight_mode='product'):
+from .internal import cite
+
+def _angle_histogram_3d(vertices, bins=16, area_weight_mode='product', sp=None):
     hull = sp.spatial.ConvexHull(vertices)
     dot_products = np.zeros((hull.equations.shape[0], hull.equations.shape[0]), dtype=np.float32)
 
@@ -59,8 +61,6 @@ def angle_histogram(box, positions, bins, buffer_distance=None, area_weight_mode
     :param buffer_distance: Distance to copy parts of the simulation box for periodic boundary conditions in the voronoi diagram computation
     :param area_weight_mode: Whether the weight for each pair of faces should be the sum ('sum') or product ('product') of the face areas
     """
-    scipy = assert_installed('scipy')
-
     if buffer_distance is None:
         buffer_distance = min(box.Lx, box.Ly, box.Lz)*.5
 
