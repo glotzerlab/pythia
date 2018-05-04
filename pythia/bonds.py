@@ -32,7 +32,7 @@ def normalized_radial_distance(box, positions, neighbors, rmax_guess=2.):
 
 @cite('freud2016')
 def neighborhood_distance_singvals(box, positions, neighbors, rmax_guess=2.):
-    """Construct a matrix of pairwise distances filled with |r_k - r_j|
+    """Construct a matrix of pairwise distances filled with `|r_k - r_j|`
     for all neighbors j and k(==j) of each particle i. Returns the
     singular values of this matrix to fix permutation invariance.
     """
@@ -58,7 +58,7 @@ def neighborhood_distance_singvals(box, positions, neighbors, rmax_guess=2.):
 
 @cite('freud2016')
 def neighborhood_range_distance_singvals(box, positions, neigh_min, neigh_max, rmax_guess=2.):
-    """Construct a matrix of pairwise distances filled with |r_k - r_j|
+    """Construct a matrix of pairwise distances filled with `|r_k - r_j|`
     for all neighbors j and k(==j) of each particle i, for a range of
     neighborhood sizes from neigh_min to neigh_max
     (inclusive). Returns the singular values of this matrix to fix
@@ -73,8 +73,8 @@ def neighborhood_range_distance_singvals(box, positions, neigh_min, neigh_max, r
 
 @cite('freud2016')
 def neighborhood_angle_singvals(box, positions, neighbors, rmax_guess=2.):
-    """Construct a matrix of pairwise angles between (rk - ri) and (rj -
-    ri) for all neighbors j and k(==j) of each particle i, for a
+    """Construct a matrix of pairwise angles between `(rk - ri)` and `(rj -
+    ri)` for all neighbors j and k(==j) of each particle i, for a
     particular number of neighbors. Returns the singular values of
     this matrix to fix permutation invariance.
     """
@@ -102,8 +102,8 @@ def neighborhood_angle_singvals(box, positions, neighbors, rmax_guess=2.):
 
 @cite('freud2016')
 def neighborhood_range_angle_singvals(box, positions, neigh_min, neigh_max, rmax_guess=2.):
-    """Construct a matrix of pairwise angles between (rk - ri) and (rj -
-    ri) for all neighbors j and k(==j) of each particle i, for a range
+    """Construct a matrix of pairwise angles between `(rk - ri)` and `(rj -
+    ri)` for all neighbors j and k(==j) of each particle i, for a range
     of neighborhood sizes from neigh_min to neigh_max
     (inclusive). Returns the singular values of this matrix to fix
     permutation invariance.
