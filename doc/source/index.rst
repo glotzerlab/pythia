@@ -42,6 +42,14 @@ The documentation is available as standard sphinx documentation::
 Automatically-built documentation is available at
 https://pythia-learn.readthedocs.io .
 
+Examples
+========
+
+Example notebooks are available in the `examples` directory:
+
+- `Unsupervised learning <https://bitbucket.org/glotzer/pythia/src/master/examples/Unsupervised%20Learning.ipynb?fileviewer=notebook-viewer%3Anbviewer>`_
+- `Supervised learning <https://bitbucket.org/glotzer/pythia/src/master/examples/Supervised%20Learning.ipynb?fileviewer=notebook-viewer%3Anbviewer>`_
+
 Contents:
 =========
 
