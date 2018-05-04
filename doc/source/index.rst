@@ -10,6 +10,10 @@ and other accelerated calculations.
 Installation
 ============
 
+Pythia is available on PyPI as `pythia-learn`::
+
+  $ pip install pythia-learn
+
 You can install pythia from source like this::
 
    $ git clone https://bitbucket.org/glotzer/pythia.git
