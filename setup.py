@@ -5,6 +5,14 @@ from setuptools import setup
 with open('pythia/version.py') as version_file:
     exec(version_file.read())
 
+long_description_lines = []
+with open('README.rst', 'r') as readme:
+    for line in readme:
+        if line.startswith('Contents'):
+            break
+        long_description_lines.append(line)
+long_description = ''.join(long_description_lines)
+
 setup(name='pythia-learn',
       author='Matthew Spellings',
       author_email='mspells@umich.edu',
@@ -18,6 +26,7 @@ setup(name='pythia-learn',
       description='Machine learning fingerprints for particle environments',
       install_requires=['numpy', 'scipy'],
       license='BSD',
+      long_description=long_description,
       package_dir={'pythia': 'pythia'},
       packages=['pythia'],
       project_urls={
