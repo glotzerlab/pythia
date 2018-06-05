@@ -29,7 +29,7 @@ def _nlist_helper(fbox, positions, neighbors, rmax_guess=2., exclude_ii=None):
 def neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
                      negative_m=True, reference_frame='neighborhood',
                      orientations=None, rmax_guess=1., noise_samples=0,
-                     noise_magnitude=0):
+                     noise_magnitude=0, nlist=None):
     """Compute the neighbor-averaged spherical harmonics over the
     nearest-neighbor bonds of a set of particles. Returns the raw
     (complex) spherical harmonic values.
@@ -43,6 +43,7 @@ def neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
     :param rmax_guess: Initial guess of the distance to find `neigh_max` nearest neighbors. Only affects algorithm speed.
     :param noise_samples: Number of random noisy samples of positions to average the result over (disabled if 0)
     :param noise_magnitude: Magnitude of (normally-distributed) noise to apply to noise_samples different positions (disabled if `noise_samples == 0`)
+    :param nlist: Freud neighbor list object to use (`None` to compute for neighbors up to `neigh_max`)
 
     """
     if noise_samples:
@@ -59,25 +60,32 @@ def neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
     box = freud.box.Box.from_box(box)
 
     if orientations is None and reference_frame == 'particle_local':
-        logging.error('reference_frame="particle_local" was given for '
+        logger.error('reference_frame="particle_local" was given for '
                       'neighbor_average, but orientations were not given')
         orientations = np.zeros((positions.shape[0], 4), dtype=np.float32)
         orientations[:, 0] = 1
 
     result = []
     comp = freud.order.LocalDescriptors(neigh_max, lmax, rmax_guess, negative_m)
-    comp.computeNList(box, positions)
+    if nlist is None:
+        nlist = freud.locality.NearestNeighbors(box, neigh_max)
+        nlist.compute(box, positions, positions)
 
-    logging.debug('rmax: {}'.format(comp.getRMax()))
+    logger.debug('rmax: {}'.format(comp.getRMax()))
+
+    neighbor_counts = nlist.neighbor_counts
+    if np.any(neighbor_counts < neigh_max):
+        indices = np.where(neighbor_counts < neigh_max)[0]
+        logger.warning('{} particles have too few neighbors'.format(len(indices)))
 
     for nNeigh in range(neigh_min, neigh_max + 1):
         # sphs::(Nbond, Nsph)
-        comp.compute(box, nNeigh, positions, positions, orientations)
+        comp.compute(box, nNeigh, positions, positions, orientations, nlist=nlist)
         sphs = comp.getSph()
 
         # average over neighbors
-        sphs = sphs.reshape((positions.shape[0], nNeigh, sphs.shape[-1]))
-        sphs = np.nanmean(sphs, axis=1)
+        sphs = np.add.reduceat(sphs, nlist.segments)
+        sphs /= np.clip(neighbor_counts, 1, nNeigh)[:, np.newaxis]
         result.append(sphs)
 
     return np.hstack(result)
@@ -86,7 +94,7 @@ def neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
 def abs_neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
                      negative_m=True, reference_frame='neighborhood',
                      orientations=None, rmax_guess=1., noise_samples=0,
-                     noise_magnitude=0):
+                     noise_magnitude=0, nlist=None):
     """Compute the neighbor-averaged spherical harmonics over the
     nearest-neighbor bonds of a set of particles. Returns the absolute
     value of the (complex) spherical harmonics
@@ -100,18 +108,20 @@ def abs_neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
     :param rmax_guess: Initial guess of the distance to find `neigh_max` nearest neighbors. Only affects algorithm speed.
     :param noise_samples: Number of random noisy samples of positions to average the result over (disabled if 0)
     :param noise_magnitude: Magnitude of (normally-distributed) noise to apply to noise_samples different positions (disabled if `noise_samples == 0`)
+    :param nlist: Freud neighbor list object to use (`None` to compute for neighbors up to `neigh_max`)
 
     """
 
     return np.abs(neighbor_average(
         box, positions, neigh_min, neigh_max, lmax, negative_m,
-        reference_frame, orientations, rmax_guess))
+        reference_frame, orientations, rmax_guess, noise_samples, noise_magnitude,
+        nlist))
 
 @cite('freud2016', 'spellings2018')
 def system_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
                    negative_m=True, reference_frame='neighborhood',
                    orientations=None, rmax_guess=1., noise_samples=0,
-                   noise_magnitude=0):
+                   noise_magnitude=0, nlist=None):
     """Compute the global-averaged spherical harmonics over the
     nearest-neighbor bonds of a set of particles. Returns the raw
     (complex) spherical harmonic values.
@@ -125,17 +135,19 @@ def system_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
     :param rmax_guess: Initial guess of the distance to find `neigh_max` nearest neighbors. Only affects algorithm speed.
     :param noise_samples: Number of random noisy samples of positions to average the result over (disabled if 0)
     :param noise_magnitude: Magnitude of (normally-distributed) noise to apply to noise_samples different positions (disabled if `noise_samples == 0`)
+    :param nlist: Freud neighbor list object to use (`None` to compute for neighbors up to `neigh_max`)
 
     """
     return np.mean(neighbor_average(
         box, positions, neigh_min, neigh_max, lmax, negative_m,
-        reference_frame, orientations, rmax_guess), axis=0)
+        reference_frame, orientations, rmax_guess, noise_samples, noise_magnitude,
+        nlist), axis=0)
 
 @cite('freud2016', 'spellings2018')
 def abs_system_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
                        negative_m=True, reference_frame='neighborhood',
                        orientations=None, rmax_guess=1., noise_samples=0,
-                       noise_magnitude=0):
+                       noise_magnitude=0, nlist=None):
     """Compute the global-averaged spherical harmonics over the
     nearest-neighbor bonds of a set of particles. Returns the absolute
     value of the (complex) spherical harmonics
@@ -149,11 +161,13 @@ def abs_system_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
     :param rmax_guess: Initial guess of the distance to find `neigh_max` nearest neighbors. Only affects algorithm speed.
     :param noise_samples: Number of random noisy samples of positions to average the result over (disabled if 0)
     :param noise_magnitude: Magnitude of (normally-distributed) noise to apply to noise_samples different positions (disabled if `noise_samples == 0`)
+    :param nlist: Freud neighbor list object to use (`None` to compute for neighbors up to `neigh_max`)
 
     """
     return np.abs(system_average(
         box, positions, neigh_min, neigh_max, lmax, negative_m,
-        reference_frame, orientations, rmax_guess))
+        reference_frame, orientations, rmax_guess, noise_samples, noise_magnitude,
+        nlist))
 
 @cite('freud2016')
 def steinhardt_q(box, positions, neighbors=12, lmax=6, rmax_guess=2.):
