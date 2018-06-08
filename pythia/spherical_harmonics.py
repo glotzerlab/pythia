@@ -68,8 +68,9 @@ def neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
     result = []
     comp = freud.order.LocalDescriptors(neigh_max, lmax, rmax_guess, negative_m)
     if nlist is None:
-        nlist = freud.locality.NearestNeighbors(box, neigh_max)
-        nlist.compute(box, positions, positions)
+        nn = freud.locality.NearestNeighbors(rmax_guess, neigh_max)
+        nn.compute(box, positions, positions)
+        nlist = nn.nlist
 
     logger.debug('rmax: {}'.format(comp.getRMax()))
 
