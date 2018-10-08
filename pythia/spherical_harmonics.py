@@ -72,8 +72,6 @@ def neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
         nn.compute(box, positions, positions)
         nlist = nn.nlist
 
-    logger.debug('rmax: {}'.format(comp.getRMax()))
-
     neighbor_counts = nlist.neighbor_counts
     if np.any(neighbor_counts < neigh_max):
         indices = np.where(neighbor_counts < neigh_max)[0]
@@ -82,7 +80,7 @@ def neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
     for nNeigh in range(neigh_min, neigh_max + 1):
         # sphs::(Nbond, Nsph)
         comp.compute(box, nNeigh, positions, positions, orientations, nlist=nlist)
-        sphs = comp.getSph()
+        sphs = comp.sph
 
         # average over neighbors
         sphs = np.add.reduceat(sphs, nlist.segments)
@@ -186,7 +184,7 @@ def steinhardt_q(box, positions, neighbors=12, lmax=6, rmax_guess=2.):
     for l in range(2, lmax + 1, 2):
         compute = freud.order.LocalQl(box, rmax_guess, l)
         compute.compute(positions)
-        op = compute.getQl()
+        op = compute.Ql
         result.append(op.copy())
 
     result = np.array(result, dtype=np.float32).T

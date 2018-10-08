@@ -68,7 +68,7 @@ def angle_histogram(box, positions, bins, buffer_distance=None, area_weight_mode
     voronoi = freud.voronoi.Voronoi(fbox, buff=buffer_distance)
     voronoi.compute(positions)
 
-    all_polyhedra = voronoi.getVoronoiPolytopes()
+    all_polyhedra = voronoi.polytopes
     polyhedra = [all_polyhedra[i] for i in range(len(positions))]
 
     result = np.zeros((len(positions), bins), dtype=np.float32)
