@@ -41,12 +41,14 @@ all_citations['freud2016'] = """
 all_citations['spellings2018'] = """
 @article{spellings2018,
         title = {Machine learning for crystal identification and discovery},
+        volume = {64},
         url = {https://dx.doi.org/10.1002/aic.16157},
         doi = {10.1002/aic.16157},
+        number = {6},
         journal = {AIChE Journal},
         author = {Spellings, Matthew and Glotzer, Sharon C},
         year = {2018},
-        note = {(in press)},
+        pages = {2198--2206},
 }
 """
 
