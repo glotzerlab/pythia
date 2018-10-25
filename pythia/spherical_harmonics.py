@@ -183,7 +183,7 @@ def steinhardt_q(box, positions, neighbors=12, lmax=6, rmax_guess=2.):
     result = []
     for l in range(2, lmax + 1, 2):
         compute = freud.order.LocalQl(box, rmax_guess, l)
-        compute.compute(positions)
+        compute.compute(positions, neighbors)
         op = compute.Ql
         result.append(op.copy())
 
