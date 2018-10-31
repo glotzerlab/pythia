@@ -12,7 +12,7 @@ Installation
 
 Pythia is available on PyPI as `pythia-learn`::
 
-  $ pip install pythia-learn
+  $ pip install pythia-learn freud-analysis
 
 You can install pythia from source like this::
 
