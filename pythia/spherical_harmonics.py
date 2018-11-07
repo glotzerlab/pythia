@@ -46,18 +46,22 @@ def neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
     :param nlist: Freud neighbor list object to use (`None` to compute for neighbors up to `neigh_max`)
 
     """
+    freud_box = freud.box.Box.from_box(box)
+
     if noise_samples:
-        to_average = []
+        accumulation = 0
         for _ in range(noise_samples):
             noise = np.random.normal(0, noise_magnitude, positions.shape)
             noisy_positions = positions + noise
-            to_average.append(neighbor_average(
-                box, positions, neigh_min, neigh_max, lmax, negative_m,
-                reference_frame, orientations, rmax_guess, 0, 0))
+            freud_box.wrap(noisy_positions)
+            noisy_descriptors = neighbor_average(
+                box, noisy_positions, neigh_min, neigh_max, lmax, negative_m,
+                reference_frame, orientations, rmax_guess, 0, 0)
 
-        return np.mean(to_average, axis=0)
+            accumulation += noisy_descriptors
 
-    box = freud.box.Box.from_box(box)
+        accumulation /= noise_samples
+        return accumulation
 
     if orientations is None and reference_frame == 'particle_local':
         logger.error('reference_frame="particle_local" was given for '
@@ -69,7 +73,7 @@ def neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
     comp = freud.environment.LocalDescriptors(neigh_max, lmax, rmax_guess, negative_m)
     if nlist is None:
         nn = freud.locality.NearestNeighbors(rmax_guess, neigh_max)
-        nn.compute(box, positions, positions)
+        nn.compute(freud_box, positions, positions)
         nlist = nn.nlist
 
     neighbor_counts = nlist.neighbor_counts
@@ -79,7 +83,7 @@ def neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
 
     for nNeigh in range(neigh_min, neigh_max + 1):
         # sphs::(Nbond, Nsph)
-        comp.compute(box, nNeigh, positions, positions, orientations, nlist=nlist)
+        comp.compute(freud_box, nNeigh, positions, positions, orientations, nlist=nlist)
         sphs = comp.sph
 
         # average over neighbors
