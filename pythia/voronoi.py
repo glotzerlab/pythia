@@ -55,7 +55,7 @@ def _angle_histogram_3d(vertices, bins=16, area_weight_mode='product'):
 def angle_histogram(box, positions, bins, buffer_distance=None, area_weight_mode='product'):
     """Compute the area-weighted (a_i + a_j) angle histogram of all pairs
     of faces for the voronoi polyhedron of each particle. Sums the areas
-    into the given number of bins (from -pi to pi).
+    into the given number of bins (from 0 to pi).
 
     :param bins: Number of bins to use for the histogram
     :param buffer_distance: Distance to copy parts of the simulation box for periodic boundary conditions in the voronoi diagram computation
