@@ -59,7 +59,7 @@ Example notebooks are available in the `examples` directory:
 
 - `Unsupervised learning <https://bitbucket.org/glotzer/pythia/src/master/examples/Unsupervised%20Learning.ipynb?viewer=nbviewer>`_
 - `Supervised learning <https://bitbucket.org/glotzer/pythia/src/master/examples/Supervised%20Learning.ipynb?viewer=nbviewer>`_
-- `Steinhardt and Pythia order parameter comparison (FCC and HCP) <https://bitbucket.org/glotzer/pythia/src/master/examples/Steinhardt FCC HCP comparison.ipynb?viewer=nbviewer>`_
+- `Steinhardt and Pythia order parameter comparison (FCC and HCP) <https://bitbucket.org/glotzer/pythia/src/master/examples/Steinhardt%20FCC%20HCP%20comparison.ipynb?viewer=nbviewer>`_
 
 Contents:
 =========
