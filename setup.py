@@ -31,7 +31,7 @@ setup(name='pythia-learn',
       packages=['pythia'],
       project_urls={
           'Documentation': 'http://pythia-learn.readthedocs.io/',
-          'Source': 'https://bitbucket.org/glotzer/pythia'
+          'Source': 'https://github.com/glotzerlab/pythia'
       },
       python_requires='>=3',
       version=__version__

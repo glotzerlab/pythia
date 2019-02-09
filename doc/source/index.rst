@@ -4,7 +4,7 @@ Welcome to pythia's documentation!
 
 Pythia is a library to generate numerical descriptions of particle
 systems. Most methods rely heavily on `freud
-<https://bitbucket.org/glotzer/freud>`_ for efficient neighbor search
+<https://github.com/glotzerlab/freud>`_ for efficient neighbor search
 and other accelerated calculations.
 
 Installation
@@ -16,7 +16,7 @@ Pythia is available on PyPI as `pythia-learn`::
 
 You can install pythia from source like this::
 
-   $ git clone https://bitbucket.org/glotzer/pythia.git
+   $ git clone https://github.com/glotzerlab/pythia.git
    $ # now install
    $ cd pythia && python setup.py install --user
 
@@ -57,9 +57,9 @@ Examples
 
 Example notebooks are available in the `examples` directory:
 
-- `Unsupervised learning <https://bitbucket.org/glotzer/pythia/src/master/examples/Unsupervised%20Learning.ipynb?viewer=nbviewer>`_
-- `Supervised learning <https://bitbucket.org/glotzer/pythia/src/master/examples/Supervised%20Learning.ipynb?viewer=nbviewer>`_
-- `Steinhardt and Pythia order parameter comparison (FCC and HCP) <https://bitbucket.org/glotzer/pythia/src/master/examples/Steinhardt%20FCC%20HCP%20comparison.ipynb?viewer=nbviewer>`_
+- `Unsupervised learning <https://github.com/glotzerlab/pythia/blob/master/examples/Unsupervised%20Learning.ipynb>`_
+- `Supervised learning <https://github.com/glotzerlab/pythia/blob/master/examples/Supervised%20Learning.ipynb>`_
+- `Steinhardt and Pythia order parameter comparison (FCC and HCP) <https://github.com/glotzerlab/pythia/blob/master/examples/Steinhardt%20FCC%20HCP%20comparison.ipynb>`_
 
 Contents:
 =========
