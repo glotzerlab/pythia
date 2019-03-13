@@ -1,0 +1,4 @@
+[run]
+source=pythia
+omit=
+    pythia/version.py
