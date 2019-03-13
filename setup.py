@@ -24,13 +24,17 @@ setup(name='pythia-learn',
           'Topic :: Scientific/Engineering :: Physics'
       ],
       description='Machine learning fingerprints for particle environments',
-      install_requires=['numpy', 'scipy'],
+      install_requires=[
+          'numpy',
+          'scipy',
+          'freud-analysis',
+      ],
       license='BSD',
       long_description=long_description,
       package_dir={'pythia': 'pythia'},
       packages=['pythia'],
       project_urls={
-          'Documentation': 'http://pythia-learn.readthedocs.io/',
+          'Documentation': 'https://pythia-learn.readthedocs.io/',
           'Source': 'https://github.com/glotzerlab/pythia'
       },
       python_requires='>=3',
