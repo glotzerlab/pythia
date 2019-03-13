@@ -3,20 +3,22 @@ This module computes descriptors based on the Voronoi tessellation
 of the system.
 """
 
-import logging
 import numpy as np
 import freud
 
-import scipy as sp, scipy.spatial
+import scipy as sp
+import scipy.spatial
 
 from .internal import cite
+
 
 def _angle_histogram_3d(vertices, bins=16, area_weight_mode='product'):
     hull = sp.spatial.ConvexHull(vertices)
     dot_products = np.zeros((hull.equations.shape[0], hull.equations.shape[0]), dtype=np.float32)
 
     # equations are already normalized for the (x, y, z) components
-    dot_products[:, :] = np.sum(hull.equations[:, np.newaxis, :3]*hull.equations[np.newaxis, :, :3], axis=-1)
+    dot_products[:, :] = np.sum(hull.equations[:, np.newaxis, :3] *
+                                hull.equations[np.newaxis, :, :3], axis=-1)
     angles = np.arccos(dot_products)
 
     facet_vertices = hull.points[hull.simplices]
@@ -51,6 +53,7 @@ def _angle_histogram_3d(vertices, bins=16, area_weight_mode='product'):
 
     return result/np.sum(area_weights)
 
+
 @cite('freud2016')
 def angle_histogram(box, positions, bins, buffer_distance=None, area_weight_mode='product'):
     """Compute the area-weighted (a_i + a_j) angle histogram of all pairs
@@ -60,7 +63,8 @@ def angle_histogram(box, positions, bins, buffer_distance=None, area_weight_mode
     :param bins: Number of bins to use for the histogram
     :param buffer_distance: Distance to copy parts of the simulation box for periodic boundary conditions in the voronoi diagram computation
     :param area_weight_mode: Whether the weight for each pair of faces should be the sum ('sum') or product ('product') of the face areas
-    """
+    """  # noqa E501
+
     if buffer_distance is None:
         buffer_distance = min(box.Lx, box.Ly, box.Lz)*.5
 

@@ -34,5 +34,5 @@ setup(name='pythia-learn',
           'Source': 'https://github.com/glotzerlab/pythia'
       },
       python_requires='>=3',
-      version=__version__
+      version=__version__  # noqa F821
       )

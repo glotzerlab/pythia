@@ -8,6 +8,7 @@ import freud
 
 from .internal import cite
 
+
 def _nlist_nn_helper(fbox, positions, neighbors, rmax_guess, exclude_ii=None):
     if isinstance(neighbors, int):
         nneigh = freud.locality.NearestNeighbors(rmax_guess, neighbors)
@@ -16,10 +17,12 @@ def _nlist_nn_helper(fbox, positions, neighbors, rmax_guess, exclude_ii=None):
 
     return neighbors
 
+
 @cite('freud2016')
 def normalized_radial_distance(box, positions, neighbors, rmax_guess=2.):
     """Returns the ratio of the euclidean distance of each near-neighbor
-    to that of the nearest neighbor for each particle"""
+    to that of the nearest neighbor for each particle.
+    """
     fbox = freud.box.Box.from_box(box)
 
     neighbors = _nlist_nn_helper(fbox, positions, neighbors, rmax_guess, True)
@@ -35,6 +38,7 @@ def normalized_radial_distance(box, positions, neighbors, rmax_guess=2.):
     # skip the shortest bond since that gets normalized down to 1
     return rs.reshape((positions.shape[0], -1))[:, 1:]
 
+
 def get_neighborhood_distance_matrix(box, positions, neighbors, rmax_guess=2.):
     fbox = freud.box.Box.from_box(box)
 
@@ -43,7 +47,8 @@ def get_neighborhood_distance_matrix(box, positions, neighbors, rmax_guess=2.):
     neighbor_indices = neighbors.index_j.reshape((positions.shape[0], -1))
 
     # (Np, Nn, Nn, 3) distance matrix
-    rijs = positions[neighbor_indices[:, :, np.newaxis]] - positions[neighbor_indices[:, np.newaxis, :]]
+    rijs = positions[neighbor_indices[:, :, np.newaxis]] - \
+        positions[neighbor_indices[:, np.newaxis, :]]
     fbox.wrap(rijs.reshape((-1, 3)))
 
     # (Np, Nn, Nn) distance matrix
@@ -54,6 +59,7 @@ def get_neighborhood_distance_matrix(box, positions, neighbors, rmax_guess=2.):
     rs /= normalization[:, np.newaxis, np.newaxis]
     return rs
 
+
 @cite('freud2016')
 def neighborhood_distance_singvals(box, positions, neighbors, rmax_guess=2.):
     """Construct a matrix of pairwise distances filled with `|r_k - r_j|`
@@ -63,6 +69,7 @@ def neighborhood_distance_singvals(box, positions, neighbors, rmax_guess=2.):
     rs = get_neighborhood_distance_matrix(box, positions, neighbors, rmax_guess)
     svals = np.linalg.svd(rs, compute_uv=False)
     return svals
+
 
 @cite('freud2016')
 def neighborhood_range_distance_singvals(box, positions, neigh_min, neigh_max, rmax_guess=2.):
@@ -79,6 +86,7 @@ def neighborhood_range_distance_singvals(box, positions, neigh_min, neigh_max, r
 
     return np.hstack(result)
 
+
 @cite('freud2016')
 def neighborhood_distance_sorted(box, positions, neighbors, rmax_guess=2.):
     """Construct a matrix of pairwise distances filled with `|r_k - r_j|`
@@ -89,6 +97,7 @@ def neighborhood_distance_sorted(box, positions, neighbors, rmax_guess=2.):
     rs = rs.reshape((rs.shape[0], -1))
     np.sort(rs)
     return rs
+
 
 def get_neighborhood_angle_matrix(box, positions, neighbors, rmax_guess=2.):
     fbox = freud.box.Box.from_box(box)
@@ -111,6 +120,7 @@ def get_neighborhood_angle_matrix(box, positions, neighbors, rmax_guess=2.):
     thetas[np.isnan(thetas)] = 0
     return thetas
 
+
 @cite('freud2016')
 def neighborhood_angle_singvals(box, positions, neighbors, rmax_guess=2.):
     """Construct a matrix of pairwise angles between `(rk - ri)` and `(rj -
@@ -121,6 +131,7 @@ def neighborhood_angle_singvals(box, positions, neighbors, rmax_guess=2.):
     thetas = get_neighborhood_angle_matrix(box, positions, neighbors, rmax_guess=2.)
     svals = np.linalg.svd(thetas, compute_uv=False)
     return svals
+
 
 @cite('freud2016')
 def neighborhood_range_angle_singvals(box, positions, neigh_min, neigh_max, rmax_guess=2.):
@@ -136,6 +147,7 @@ def neighborhood_range_angle_singvals(box, positions, neigh_min, neigh_max, rmax
         result.append(neighborhood_angle_singvals(box, positions, neighbors, rmax_guess))
 
     return np.hstack(result)
+
 
 @cite('freud2016')
 def neighborhood_angle_sorted(box, positions, neighbors, rmax_guess=2.):

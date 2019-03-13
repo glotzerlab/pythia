@@ -1,4 +1,3 @@
-from collections import namedtuple
 import functools
 from importlib import import_module
 import inspect
@@ -7,11 +6,13 @@ import textwrap
 
 logger = logging.getLogger(__name__)
 
+
 def assert_installed(name):
     try:
         return import_module(name)
-    except ImportError as error:
+    except ImportError:
         raise ImportError("{} required for requested functionality.".format(name))
+
 
 all_citations = {}
 
@@ -24,7 +25,7 @@ all_citations['kondor2007'] = """
         month = jan,
         year = {2007},
 }
-"""
+"""  # noqa E501
 
 all_citations['freud2016'] = """
 @misc{freud2016,
@@ -36,7 +37,7 @@ all_citations['freud2016'] = """
         year = {2016},
         doi = {10.5281/zenodo.166564},
 }
-"""
+"""  # noqa E501
 
 all_citations['spellings2018'] = """
 @article{spellings2018,
@@ -52,12 +53,14 @@ all_citations['spellings2018'] = """
 }
 """
 
+
 def _cite(f, extra_doc):
     if f.__doc__ is None:
         f.__doc__ = ''
 
     f.__doc__ = inspect.cleandoc(f.__doc__) + extra_doc
     return f
+
 
 def cite(*args):
     """Decorator for adding citation notes to docstrings"""

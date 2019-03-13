@@ -13,6 +13,7 @@ from .internal import assert_installed, cite
 
 logger = logging.getLogger(__name__)
 
+
 def _nlist_helper(fbox, positions, neighbors, rmax_guess=2., exclude_ii=None):
     if isinstance(neighbors, int):
         nneigh = freud.locality.NearestNeighbors(rmax_guess, neighbors)
@@ -24,6 +25,7 @@ def _nlist_helper(fbox, positions, neighbors, rmax_guess=2., exclude_ii=None):
         neighbors = lc.nlist
 
     return neighbors
+
 
 @cite('freud2016', 'spellings2018')
 def neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
@@ -44,8 +46,7 @@ def neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
     :param noise_samples: Number of random noisy samples of positions to average the result over (disabled if 0)
     :param noise_magnitude: Magnitude of (normally-distributed) noise to apply to noise_samples different positions (disabled if `noise_samples == 0`)
     :param nlist: Freud neighbor list object to use (`None` to compute for neighbors up to `neigh_max`)
-
-    """
+    """  # noqa E501
     freud_box = freud.box.Box.from_box(box)
 
     if noise_samples:
@@ -65,7 +66,7 @@ def neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
 
     if orientations is None and reference_frame == 'particle_local':
         logger.error('reference_frame="particle_local" was given for '
-                      'neighbor_average, but orientations were not given')
+                     'neighbor_average, but orientations were not given')
         orientations = np.zeros((positions.shape[0], 4), dtype=np.float32)
         orientations[:, 0] = 1
 
@@ -93,11 +94,12 @@ def neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
 
     return np.hstack(result)
 
+
 @cite('freud2016', 'spellings2018')
 def abs_neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
-                     negative_m=True, reference_frame='neighborhood',
-                     orientations=None, rmax_guess=1., noise_samples=0,
-                     noise_magnitude=0, nlist=None):
+                         negative_m=True, reference_frame='neighborhood',
+                         orientations=None, rmax_guess=1., noise_samples=0,
+                         noise_magnitude=0, nlist=None):
     """Compute the neighbor-averaged spherical harmonics over the
     nearest-neighbor bonds of a set of particles. Returns the absolute
     value of the (complex) spherical harmonics
@@ -112,13 +114,12 @@ def abs_neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
     :param noise_samples: Number of random noisy samples of positions to average the result over (disabled if 0)
     :param noise_magnitude: Magnitude of (normally-distributed) noise to apply to noise_samples different positions (disabled if `noise_samples == 0`)
     :param nlist: Freud neighbor list object to use (`None` to compute for neighbors up to `neigh_max`)
-
-    """
-
+    """  # noqa E501
     return np.abs(neighbor_average(
         box, positions, neigh_min, neigh_max, lmax, negative_m,
         reference_frame, orientations, rmax_guess, noise_samples, noise_magnitude,
         nlist))
+
 
 @cite('freud2016', 'spellings2018')
 def system_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
@@ -139,12 +140,12 @@ def system_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
     :param noise_samples: Number of random noisy samples of positions to average the result over (disabled if 0)
     :param noise_magnitude: Magnitude of (normally-distributed) noise to apply to noise_samples different positions (disabled if `noise_samples == 0`)
     :param nlist: Freud neighbor list object to use (`None` to compute for neighbors up to `neigh_max`)
-
-    """
+    """  # noqa E501
     return np.mean(neighbor_average(
         box, positions, neigh_min, neigh_max, lmax, negative_m,
         reference_frame, orientations, rmax_guess, noise_samples, noise_magnitude,
         nlist), axis=0)
+
 
 @cite('freud2016', 'spellings2018')
 def abs_system_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
@@ -165,12 +166,12 @@ def abs_system_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
     :param noise_samples: Number of random noisy samples of positions to average the result over (disabled if 0)
     :param noise_magnitude: Magnitude of (normally-distributed) noise to apply to noise_samples different positions (disabled if `noise_samples == 0`)
     :param nlist: Freud neighbor list object to use (`None` to compute for neighbors up to `neigh_max`)
-
-    """
+    """  # noqa E501
     return np.abs(system_average(
         box, positions, neigh_min, neigh_max, lmax, negative_m,
         reference_frame, orientations, rmax_guess, noise_samples, noise_magnitude,
         nlist))
+
 
 @cite('freud2016')
 def steinhardt_q(box, positions, neighbors=12, lmax=6, rmax_guess=2.):
@@ -179,8 +180,7 @@ def steinhardt_q(box, positions, neighbors=12, lmax=6, rmax_guess=2.):
     :param neighbors: Number of neighbors (int) or maximum distance to find neighbors within (float)
     :param lmax: Maximum spherical harmonic degree l
     :param rmax_guess: Initial guess of the distance to find nearest neighbors, if appropriate. Only affects algorithm speed.
-
-    """
+    """  # noqa E501
     box = freud.box.Box.from_box(box)
     neighbors = _nlist_helper(box, positions, neighbors, rmax_guess)
 
@@ -193,6 +193,7 @@ def steinhardt_q(box, positions, neighbors=12, lmax=6, rmax_guess=2.):
 
     result = np.array(result, dtype=np.float32).T
     return result
+
 
 class _clebsch_gordan_cache(object):
     _cache = {}
@@ -207,6 +208,7 @@ class _clebsch_gordan_cache(object):
 
         return self._cache[key]
 
+
 @cite('kondor2007', 'freud2016')
 def bispectrum(box, positions, neighbors, lmax, rmax_guess=2.):
     """Computes bispectrum invariants of particle local
@@ -217,9 +219,8 @@ def bispectrum(box, positions, neighbors, lmax, rmax_guess=2.):
 
     :param neighbors: number of nearest-neighbors to consider for local environments
     :param lmax: maximum spherical harmonic degree to consider. O(lmax**3) descriptors will be generated.
-    """
+    """  # noqa E501
     fsph = assert_installed('fsph')
-    sympy = assert_installed('sympy')
 
     box = freud.box.Box.from_box(box)
     nlist = _nlist_helper(box, positions, neighbors, rmax_guess)
