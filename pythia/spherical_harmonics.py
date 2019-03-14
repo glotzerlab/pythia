@@ -198,15 +198,16 @@ def steinhardt_q(box, positions, neighbors=12, lmax=6, rmax_guess=2.):
 class _clebsch_gordan_cache(object):
     _cache = {}
 
-    def __call__(self, l1, l2, l3, m1, m2, m3):
+    @classmethod
+    def get(cls, l1, l2, l3, m1, m2, m3):
         sympy = assert_installed('sympy')
         assert_installed('sympy.physics.wigner')
         key = (l1, l2, l3, m1, m2, m3)
 
-        if key not in self._cache:
-            self._cache[key] = float(sympy.physics.wigner.clebsch_gordan(*key))
+        if key not in cls._cache:
+            cls._cache[key] = float(sympy.physics.wigner.clebsch_gordan(*key))
 
-        return self._cache[key]
+        return cls._cache[key]
 
 
 @cite('kondor2007', 'freud2016')
@@ -249,7 +250,7 @@ def bispectrum(box, positions, neighbors, lmax, rmax_guess=2.):
             m1_min = max(-l1, m - l2)
             m1_max = min(l1, m + l2)
             for m1 in range(m1_min, m1_max + 1):
-                term = _clebsch_gordan_cache()(l1, l2, l, m1, m - m1, m)
+                term = _clebsch_gordan_cache.get(l1, l2, l, m1, m - m1, m)
 
                 if term == 0:
                     continue
