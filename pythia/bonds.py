@@ -100,6 +100,9 @@ def neighborhood_distance_sorted(box, positions, neighbors, rmax_guess=2.):
 
 
 def get_neighborhood_angle_matrix(box, positions, neighbors, rmax_guess=2.):
+    """Construct a matrix of pairwise angles between `|r_j - r_i|` and `|r_k - r_i|`
+    for all neighbors j and k of each particle i.
+    """
     fbox = freud.box.Box.from_box(box)
 
     neighbors = _nlist_nn_helper(fbox, positions, neighbors, rmax_guess)

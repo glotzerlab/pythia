@@ -19,6 +19,67 @@ class TestBonds(unittest.TestCase):
 
         self.assertEqual(descriptors.shape, (N, Nneigh))
 
+    def test_get_neighborhood_distance_matrix(self):
+        Nneigh = 6
+        box = freud.box.Box.cube(10)
+        positions = np.array(
+            [[0, 0, 0], [0, 1, 0], [0, 2, 0],
+             [1, 0, 0], [1, 1, 0], [1, 2, 0],
+             [2, 0, 0], [2, 1, 0], [2, 2, 0],
+             [0, 0, 1], [0, 1, 1], [0, 2, 1],
+             [1, 0, 1], [1, 1, 1], [1, 2, 1],
+             [2, 0, 1], [2, 1, 1], [2, 2, 1],
+             [0, 0, 2], [0, 1, 2], [0, 2, 2],
+             [1, 0, 2], [1, 1, 2], [1, 2, 2],
+             [2, 0, 2], [2, 1, 2], [2, 2, 2]]).astype(np.float32)
+
+        matrix = pythia.bonds.get_neighborhood_distance_matrix(
+            box, positions, Nneigh, rmax_guess=2.)
+
+        # Particle 13 at [1, 1, 1] would have closest neighbors at
+        # [1 +- 1, 1 +- 1, 1 +- 1], so the unnormalized distance matrix would be
+        # consisting of only sqrt(2) and 2, while normalized one would only have
+        # 1 and sqrt(2).
+
+        idx_111 = 13
+        self.assertAlmostEquals(matrix[idx_111, 0, 0], 0)
+
+        # By definition of the noramlization.
+        self.assertAlmostEquals(matrix[idx_111, 0, 1], 1)
+
+        # By calculating distance and normalize by sqrt(2).
+        np.testing.assert_almost_equal(matrix[idx_111, 0, 1:],
+                                       [1, 1, 1, 1, np.sqrt(2)])
+
+    def test_get_neighborhood_angle_matrix(self):
+        Nneigh = 6
+        box = freud.box.Box.cube(10)
+        positions = np.array(
+            [[0, 0, 0], [0, 1, 0], [0, 2, 0],
+             [1, 0, 0], [1, 1, 0], [1, 2, 0],
+             [2, 0, 0], [2, 1, 0], [2, 2, 0],
+             [0, 0, 1], [0, 1, 1], [0, 2, 1],
+             [1, 0, 1], [1, 1, 1], [1, 2, 1],
+             [2, 0, 1], [2, 1, 1], [2, 2, 1],
+             [0, 0, 2], [0, 1, 2], [0, 2, 2],
+             [1, 0, 2], [1, 1, 2], [1, 2, 2],
+             [2, 0, 2], [2, 1, 2], [2, 2, 2]]).astype(np.float32)
+
+        matrix = pythia.bonds.get_neighborhood_angle_matrix(
+            box, positions, Nneigh, rmax_guess=2.)
+
+        # Particle 13 at [1, 1, 1] would have closest neighbors at
+        # [1 +- 1, 1 +- 1, 1 +- 1], so the unnormalized distance matrix would be
+        # consisting of only sqrt(2) and 2, while normalized one would only have
+        # 1 and sqrt(2).
+
+        idx_111 = 13
+        self.assertAlmostEquals(matrix[idx_111, 0, 0], 0)
+
+        # By calculating distance and normalize by sqrt(2).
+        np.testing.assert_almost_equal(matrix[idx_111, 0, 1:],
+                                       np.array([1, 1, 1, 1, 2]) * np.pi / 2,
+                                       decimal=4,)
 
 if __name__ == '__main__':
     unittest.main()

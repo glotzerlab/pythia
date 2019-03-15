@@ -65,8 +65,11 @@ def angle_histogram(box, positions, bins, buffer_distance=None, area_weight_mode
     :param area_weight_mode: Whether the weight for each pair of faces should be the sum ('sum') or product ('product') of the face areas
     """  # noqa E501
 
+    # The buffer distance is used to produce image for the periodic boundary condition,
+    # to avoid corner cases like particles are only in one quadrant, we need to take the max
+    # value of the box dimension as the replication buffer distance.
     if buffer_distance is None:
-        buffer_distance = min(box.Lx, box.Ly, box.Lz)*.5
+        buffer_distance = max(box.Lx, box.Ly, box.Lz)
 
     fbox = freud.box.Box.from_box(box)
     voronoi = freud.voronoi.Voronoi(fbox, buff=buffer_distance)
