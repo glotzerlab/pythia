@@ -39,7 +39,10 @@ def normalized_radial_distance(box, positions, neighbors, rmax_guess=2.):
     return rs.reshape((positions.shape[0], -1))[:, 1:]
 
 
-def get_neighborhood_distance_matrix(box, positions, neighbors, rmax_guess=2.):
+def _get_neighborhood_distance_matrix(box, positions, neighbors, rmax_guess=2.):
+    """Construct a matrix of pairwise distances between `r_j - r_i` and `r_k - r_i`
+    for all neighbors j and k of each particle i.
+    """
     fbox = freud.box.Box.from_box(box)
 
     neighbors = _nlist_nn_helper(fbox, positions, neighbors, rmax_guess, True)
@@ -66,7 +69,7 @@ def neighborhood_distance_singvals(box, positions, neighbors, rmax_guess=2.):
     for all neighbors j and k(==j) of each particle i. Returns the
     singular values of this matrix to fix permutation invariance.
     """
-    rs = get_neighborhood_distance_matrix(box, positions, neighbors, rmax_guess)
+    rs = _get_neighborhood_distance_matrix(box, positions, neighbors, rmax_guess)
     svals = np.linalg.svd(rs, compute_uv=False)
     return svals
 
@@ -93,14 +96,14 @@ def neighborhood_distance_sorted(box, positions, neighbors, rmax_guess=2.):
     for all neighbors j and k(==j) of each particle i. Returns the
     sorted contents of this matrix to fix permutation invariance.
     """
-    rs = get_neighborhood_distance_matrix(box, positions, neighbors, rmax_guess)
+    rs = _get_neighborhood_distance_matrix(box, positions, neighbors, rmax_guess)
     rs = rs.reshape((rs.shape[0], -1))
     np.sort(rs)
     return rs
 
 
-def get_neighborhood_angle_matrix(box, positions, neighbors, rmax_guess=2.):
-    """Construct a matrix of pairwise angles between `|r_j - r_i|` and `|r_k - r_i|`
+def _get_neighborhood_angle_matrix(box, positions, neighbors, rmax_guess=2.):
+    """Construct a matrix of pairwise angles between `r_j - r_i` and `r_k - r_i`
     for all neighbors j and k of each particle i.
     """
     fbox = freud.box.Box.from_box(box)
@@ -131,7 +134,7 @@ def neighborhood_angle_singvals(box, positions, neighbors, rmax_guess=2.):
     particular number of neighbors. Returns the singular values of
     this matrix to fix permutation invariance.
     """
-    thetas = get_neighborhood_angle_matrix(box, positions, neighbors, rmax_guess=2.)
+    thetas = _get_neighborhood_angle_matrix(box, positions, neighbors, rmax_guess=2.)
     svals = np.linalg.svd(thetas, compute_uv=False)
     return svals
 
@@ -159,7 +162,7 @@ def neighborhood_angle_sorted(box, positions, neighbors, rmax_guess=2.):
     particular number of neighbors. Returns the sorted values of
     this matrix to fix permutation invariance.
     """
-    thetas = get_neighborhood_angle_matrix(box, positions, neighbors, rmax_guess=2.)
+    thetas = _get_neighborhood_angle_matrix(box, positions, neighbors, rmax_guess=2.)
     thetas = thetas.reshape((thetas.shape[0], -1))
     np.sort(thetas)
     return thetas

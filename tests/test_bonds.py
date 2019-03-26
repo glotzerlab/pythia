@@ -33,7 +33,7 @@ class TestBonds(unittest.TestCase):
              [1, 0, 2], [1, 1, 2], [1, 2, 2],
              [2, 0, 2], [2, 1, 2], [2, 2, 2]]).astype(np.float32)
 
-        matrix = pythia.bonds.get_neighborhood_distance_matrix(
+        matrix = pythia.bonds._get_neighborhood_distance_matrix(
             box, positions, Nneigh, rmax_guess=2.)
 
         # Particle 13 at [1, 1, 1] would have closest neighbors at
@@ -65,7 +65,7 @@ class TestBonds(unittest.TestCase):
              [1, 0, 2], [1, 1, 2], [1, 2, 2],
              [2, 0, 2], [2, 1, 2], [2, 2, 2]]).astype(np.float32)
 
-        matrix = pythia.bonds.get_neighborhood_angle_matrix(
+        matrix = pythia.bonds._get_neighborhood_angle_matrix(
             box, positions, Nneigh, rmax_guess=2.)
 
         # Particle 13 at [1, 1, 1] would have closest neighbors at
