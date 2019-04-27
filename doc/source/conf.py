@@ -46,7 +46,24 @@ extensions = [
     'sphinx.ext.viewcode',
 ]
 
-autodoc_mock_imports = ['freud', 'numpy', 'scipy']
+autodoc_mock_imports = [
+    'freud',
+    'fsph',
+    'fsph.tf_ops',
+    'gtar',
+    'h5py',
+    'numpy',
+    'tensorflow',
+    'tensorflow.core',
+    'tensorflow.core.protobuf',
+    'tensorflow.python',
+    'tensorflow.python.client',
+    'tensorflow.python.framework',
+    'tensorflow.python.training',
+    'tensorflow.python.ops',
+    'scipy',
+    'scipy.sparse',
+]
 
 sys.modules.update((mod_name, Mock()) for mod_name in autodoc_mock_imports)
 

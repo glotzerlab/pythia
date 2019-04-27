@@ -70,6 +70,7 @@ Contents:
    bonds
    spherical_harmonics
    voronoi
+   learned
 
 Indices and tables
 ==================
