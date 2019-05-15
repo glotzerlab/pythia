@@ -43,6 +43,13 @@ class SphericalHarmonics(keras.layers.Layer):
         self.diagonal_phitheta = _xyz_to_phitheta(xyz)
         self.spherical_harmonics = fsph.tf_ops.spherical_harmonic_series(
             self.diagonal_phitheta, self.lmax, self.negative_m)
+
+        symbolic_shape = K.shape(self.spherical_harmonics)
+        shape = K.int_shape(self.spherical_harmonics)[:-1]
+        full_shape = ([v if v is not None else symbolic_shape[i] for (i, v) in enumerate(shape)] +
+                      [self.num_sphs])
+        self.spherical_harmonics = K.reshape(self.spherical_harmonics, full_shape)
+
         return self.spherical_harmonics
 
     def compute_output_shape(self, input_shape):
