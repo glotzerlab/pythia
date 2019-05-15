@@ -112,9 +112,10 @@ class ComplexProjection(keras.layers.Layer):
     :param num_projections: Number of projections (i.e. number of neurons) to create for each rotation
     :param conversion: Method to make the projection output real: 'abs' (absolute value), 'angle' (complex phase), 'real' (real component), 'imag' (imaginary component), or a comma-separated list of these values (i.e. 'real,imag')
     """
-    def __init__(self, num_projections=1, conversion='abs', **kwargs):
+    def __init__(self, num_projections=1, conversion='abs', activation=None, **kwargs):
         self.num_projections = int(num_projections)
         self.conversion = conversion
+        self.activation = keras.activations.get(activation)
 
         super(ComplexProjection, self).__init__(**kwargs)
 
@@ -125,6 +126,12 @@ class ComplexProjection(keras.layers.Layer):
         self.projection = self.add_weight(
             'projection', shape,
             initializer=keras.initializers.RandomUniform(-weight_scale, weight_scale))
+        num_conversions = len(self.conversion.split(','))
+        # (rotations, projections*conversions)
+        bias_shape = (input_shape[-2], self.num_projections*num_conversions)
+        self.bias = self.add_weight(
+            'bias', bias_shape,
+            initializer=keras.initializers.RandomNormal())
 
         for _ in range(len(shape), len(input_shape)):
             self.projection = K.expand_dims(self.projection, 0)
@@ -156,7 +163,7 @@ class ComplexProjection(keras.layers.Layer):
         else:
             self.projected = result[0]
 
-        return self.projected
+        return self.activation(self.projected + self.bias)
 
     def compute_output_shape(self, input_shape):
         # (..., num_sphs) -> (..., num_projections)
@@ -167,7 +174,9 @@ class ComplexProjection(keras.layers.Layer):
     def get_config(self):
         config = super().get_config()
         config.update(dict(num_projections=self.num_projections,
-                           conversion=self.conversion))
+                           conversion=self.conversion,
+                           activation=keras.activations.serialize(self.activation),
+        ))
         return config
 
 
