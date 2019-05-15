@@ -169,3 +169,44 @@ class ComplexProjection(keras.layers.Layer):
         config.update(dict(num_projections=self.num_projections,
                            conversion=self.conversion))
         return config
+
+
+class ComplexDropout(keras.layers.Dropout):
+    """Dropout layer for complex outputs.
+
+    Randomly sets the given fraction of inputs to 0 during
+    training. This layer is specialized to work for complex values,
+    since the standard dropout layer in keras only works for
+    floating-point values. Interface is identical to
+    :py:class:`keras.layers.Dropout`.
+
+    """
+    def _get_noise_shape(self, inputs):
+        if self.noise_shape is None:
+            noise_shape = K.int_shape(inputs)
+        else:
+            noise_shape = self.noise_shape
+
+        symbolic_shape = K.shape(inputs)
+        noise_shape = [symbolic_shape[axis] if shape is None else shape
+                       for axis, shape in enumerate(noise_shape)]
+        return tuple(noise_shape)
+
+    def call(self, inputs, training=None):
+        if 0. < self.rate < 1.:
+            noise_shape = self._get_noise_shape(inputs)
+
+            def dropped_inputs():
+                seed = self.seed
+                if seed is None:
+                    seed = np.random.randint(10e6)
+
+                # filt indicates where to pass values through
+                filt = K.random_uniform(noise_shape, seed=seed) > self.rate
+                scale_and_filt = K.cast(filt, tf.complex64)/(1 - self.rate)
+
+                return inputs*scale_and_filt
+
+            return K.in_train_phase(dropped_inputs, inputs,
+                                    training=training)
+        return inputs
