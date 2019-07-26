@@ -1,6 +1,6 @@
 ## v0.2.5
 
-- Bugfix: fix rotational invariance of bispectrum descriptors (mspells)
+- Bugfix: fix rotational invariance of bispectrum descriptors (csadorf,mspells)
 
 ## v0.2.4
 
