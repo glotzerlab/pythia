@@ -237,6 +237,10 @@ def bispectrum(box, positions, neighbors, lmax, rmax_guess=2.):
     sphs[np.isnan(sphs)] = 0
     lm_columns = {(l, m): i for (i, (l, m)) in enumerate(fsph.get_LMs(lmax, negative_m=True))}
 
+    for (_, m), i in lm_columns.items():
+        if m > 0 and m % 2:
+            sphs[:, i] *= -1
+
     result = defaultdict(lambda: 0)
     for (l1, l2, l) in itertools.product(range(lmax + 1), range(lmax + 1), range(lmax + 1)):
         result_key = (l1, l2, l)
