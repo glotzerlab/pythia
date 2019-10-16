@@ -122,7 +122,7 @@ def _get_neighborhood_angle_matrix(box, positions, neighbors, rmax_guess=2.):
 
     # (Np, Nn, Nn) dot products of distances
     dots = np.sum(rijs[:, :, np.newaxis]*rijs[:, np.newaxis, :], axis=-1)
-    thetas = np.arccos(dots)
+    thetas = np.arccos(np.clip(dots, -1., 1.))
     thetas[np.isnan(thetas)] = 0
     return thetas
 
