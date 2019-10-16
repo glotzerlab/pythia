@@ -9,11 +9,13 @@ import freud
 from .internal import cite
 
 
-def _nlist_nn_helper(fbox, positions, neighbors, rmax_guess, exclude_ii=None):
+def _nlist_nn_helper(fbox, positions, neighbors, rmax_guess, exclude_ii=True):
     if isinstance(neighbors, int):
-        nneigh = freud.locality.NearestNeighbors(rmax_guess, neighbors)
-        nneigh.compute(fbox, positions, positions, exclude_ii)
-        neighbors = nneigh.nlist
+        aq = freud.AABBQuery(fbox, positions)
+        result = aq.query(positions, {'num_neighbors': neighbors,
+                                      'r_guess': rmax_guess,
+                                      'exclude_ii': exclude_ii})
+        neighbors = result.toNeighborList()
 
     return neighbors
 
@@ -27,7 +29,7 @@ def normalized_radial_distance(box, positions, neighbors, rmax_guess=2.):
 
     neighbors = _nlist_nn_helper(fbox, positions, neighbors, rmax_guess, True)
 
-    rijs = positions[neighbors.index_j] - positions[neighbors.index_i]
+    rijs = positions[neighbors.point_indices] - positions[neighbors.query_point_indices]
     fbox.wrap(rijs)
 
     rs = np.linalg.norm(rijs, axis=-1)
@@ -47,7 +49,7 @@ def _get_neighborhood_distance_matrix(box, positions, neighbors, rmax_guess=2.):
 
     neighbors = _nlist_nn_helper(fbox, positions, neighbors, rmax_guess, True)
 
-    neighbor_indices = neighbors.index_j.reshape((positions.shape[0], -1))
+    neighbor_indices = neighbors.point_indices.reshape((positions.shape[0], -1))
 
     # (Np, Nn, Nn, 3) distance matrix
     rijs = positions[neighbor_indices[:, :, np.newaxis]] - \
@@ -108,9 +110,9 @@ def _get_neighborhood_angle_matrix(box, positions, neighbors, rmax_guess=2.):
     """
     fbox = freud.box.Box.from_box(box)
 
-    neighbors = _nlist_nn_helper(fbox, positions, neighbors, rmax_guess)
+    neighbors = _nlist_nn_helper(fbox, positions, neighbors, rmax_guess, True)
 
-    neighbor_indices = neighbors.index_j.reshape((positions.shape[0], -1))
+    neighbor_indices = neighbors.point_indices.reshape((positions.shape[0], -1))
 
     # (Np, Nn, 3) distance matrix
     rijs = positions[neighbor_indices] - positions[:, np.newaxis, :]

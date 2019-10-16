@@ -14,15 +14,15 @@ from .internal import assert_installed, cite
 logger = logging.getLogger(__name__)
 
 
-def _nlist_helper(fbox, positions, neighbors, rmax_guess=2., exclude_ii=None):
+def _nlist_helper(fbox, positions, neighbors, exclude_ii=None):
     if isinstance(neighbors, int):
-        nneigh = freud.locality.NearestNeighbors(rmax_guess, neighbors)
-        nneigh.compute(fbox, positions, positions, exclude_ii)
-        neighbors = nneigh.nlist
+        aq = freud.AABBQuery(fbox, positions)
+        result = aq.query(positions, {'num_neighbors': neighbors, 'exclude_ii': exclude_ii})
+        neighbors = result.toNeighborList()
     elif isinstance(neighbors, float):
-        lc = freud.locality.LinkCell(fbox, neighbors)
-        lc.compute(fbox, positions, positions, exclude_ii)
-        neighbors = lc.nlist
+        aq = freud.AABBQuery(fbox, positions)
+        result = aq.query(positions, {'r_max': neighbors, 'exclude_ii': exclude_ii})
+        neighbors = result.toNeighborList()
 
     return neighbors
 
@@ -71,11 +71,10 @@ def neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
         orientations[:, 0] = 1
 
     result = []
-    comp = freud.environment.LocalDescriptors(neigh_max, lmax, rmax_guess, negative_m)
+    comp = freud.environment.LocalDescriptors(l_max=lmax, negative_m=negative_m, mode=reference_frame)
+
     if nlist is None:
-        nn = freud.locality.NearestNeighbors(rmax_guess, neigh_max)
-        nn.compute(freud_box, positions, positions)
-        nlist = nn.nlist
+        nlist = _nlist_helper(freud_box, positions, neigh_max)
 
     neighbor_counts = nlist.neighbor_counts
     if np.any(neighbor_counts < neigh_max):
@@ -84,7 +83,7 @@ def neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
 
     for nNeigh in range(neigh_min, neigh_max + 1):
         # sphs::(Nbond, Nsph)
-        comp.compute(freud_box, nNeigh, positions, positions, orientations, nlist=nlist)
+        comp.compute((freud_box, positions), orientations=orientations, neighbors=nlist)
         sphs = comp.sph
 
         # average over neighbors
@@ -186,9 +185,9 @@ def steinhardt_q(box, positions, neighbors=12, lmax=6, rmax_guess=2.):
 
     result = []
     for l in range(2, lmax + 1, 2):
-        compute = freud.order.LocalQl(box, rmax_guess, l)
-        compute.compute(positions, neighbors)
-        op = compute.Ql
+        compute = freud.order.Steinhardt(l)
+        compute.compute((box, positions), neighbors)
+        op = compute.particle_order
         result.append(op.copy())
 
     result = np.array(result, dtype=np.float32).T
@@ -226,7 +225,7 @@ def bispectrum(box, positions, neighbors, lmax, rmax_guess=2.):
     box = freud.box.Box.from_box(box)
     nlist = _nlist_helper(box, positions, neighbors, rmax_guess)
 
-    rijs = positions[nlist.index_j] - positions[nlist.index_i]
+    rijs = positions[nlist.point_indices] - positions[nlist.query_point_indices]
     box.wrap(rijs)
 
     phi = np.arccos(rijs[..., 2]/np.sqrt(np.sum(rijs**2, axis=-1)))
