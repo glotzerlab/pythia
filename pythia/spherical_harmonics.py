@@ -71,7 +71,8 @@ def neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
         orientations[:, 0] = 1
 
     result = []
-    comp = freud.environment.LocalDescriptors(l_max=lmax, negative_m=negative_m, mode=reference_frame)
+    comp = freud.environment.LocalDescriptors(
+        l_max=lmax, negative_m=negative_m, mode=reference_frame)
 
     if nlist is None:
         nlist = _nlist_helper(freud_box, positions, neigh_max)

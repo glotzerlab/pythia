@@ -29,5 +29,6 @@ class TestVoronoi(unittest.TestCase):
         np.testing.assert_equal(np.where(descriptors[idx_111])[0],
                                 np.array([0, bins//2, bins-1]))
 
+
 if __name__ == '__main__':
     unittest.main()
