@@ -27,7 +27,7 @@ setup(name='pythia-learn',
       install_requires=[
           'numpy',
           'scipy',
-          'freud-analysis',
+          'freud-analysis>=2.0',
       ],
       license='BSD',
       long_description=long_description,

@@ -1,4 +1,4 @@
 numpy
 scipy
-freud-analysis
+freud-analysis>=2.0
 fsph
