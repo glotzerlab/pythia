@@ -42,10 +42,10 @@ class TestBonds(unittest.TestCase):
         # 1 and sqrt(2).
 
         idx_111 = 13
-        self.assertAlmostEquals(matrix[idx_111, 0, 0], 0)
+        self.assertAlmostEqual(matrix[idx_111, 0, 0], 0)
 
         # By definition of the noramlization.
-        self.assertAlmostEquals(matrix[idx_111, 0, 1], 1)
+        self.assertAlmostEqual(matrix[idx_111, 0, 1], 1)
 
         # By calculating distance and normalize by sqrt(2).
         np.testing.assert_almost_equal(matrix[idx_111, 0, 1:],
@@ -74,7 +74,7 @@ class TestBonds(unittest.TestCase):
         # 1 and sqrt(2).
 
         idx_111 = 13
-        self.assertAlmostEquals(matrix[idx_111, 0, 0], 0)
+        self.assertAlmostEqual(matrix[idx_111, 0, 0], 0)
 
         # By calculating distance and normalize by sqrt(2).
         np.testing.assert_almost_equal(matrix[idx_111, 0, 1:],
