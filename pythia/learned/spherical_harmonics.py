@@ -111,27 +111,33 @@ class ComplexProjection(keras.layers.Layer):
 
     :param num_projections: Number of projections (i.e. number of neurons) to create for each rotation
     :param conversion: Method to make the projection output real: 'abs' (absolute value), 'angle' (complex phase), 'real' (real component), 'imag' (imaginary component), or a comma-separated list of these values (i.e. 'real,imag')
+    :param activation: Keras activation function for the layer
+    :param kernel_initializer: Keras initializer for the projection weights matrix
+    :param bias_initializer: Keras initializer for the projection bias matrix
     """
-    def __init__(self, num_projections=1, conversion='abs', activation=None, **kwargs):
+    def __init__(self, num_projections=1, conversion='abs', activation=None,
+                 kernel_initializer='glorot_uniform',
+                 bias_initializer='random_normal', **kwargs):
         self.num_projections = int(num_projections)
         self.conversion = conversion
         self.activation = keras.activations.get(activation)
+        self.kernel_initializer = kernel_initializer
+        self.bias_initializer = bias_initializer
 
         super(ComplexProjection, self).__init__(**kwargs)
 
     def build(self, input_shape):
         # (rotations, spherical_harmonics, projections)
         shape = (input_shape[-2], input_shape[-1], self.num_projections)
-        weight_scale = np.sqrt(6.0/(shape[-2] + shape[-1]))
         self.projection = self.add_weight(
             'projection', shape,
-            initializer=keras.initializers.RandomUniform(-weight_scale, weight_scale))
+            initializer=keras.initializers.get(self.kernel_initializer))
         num_conversions = len(self.conversion.split(','))
         # (rotations, projections*conversions)
         bias_shape = (input_shape[-2], self.num_projections*num_conversions)
         self.bias = self.add_weight(
             'bias', bias_shape,
-            initializer=keras.initializers.RandomNormal())
+            initializer=keras.initializers.get(self.bias_initializer))
 
         for _ in range(len(shape), len(input_shape)):
             self.projection = K.expand_dims(self.projection, 0)
@@ -173,9 +179,12 @@ class ComplexProjection(keras.layers.Layer):
 
     def get_config(self):
         config = super().get_config()
-        config.update(dict(num_projections=self.num_projections,
-                           conversion=self.conversion,
-                           activation=keras.activations.serialize(self.activation),
+        config.update(dict(
+            num_projections=self.num_projections,
+            conversion=self.conversion,
+            activation=keras.activations.serialize(self.activation),
+            kernel_initializer=keras.initializers.serialize(self.kernel_initializer),
+            bias_initializer=keras.initializers.serialize(self.bias_initializer),
         ))
         return config
 
