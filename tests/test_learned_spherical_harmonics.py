@@ -45,6 +45,7 @@ class TestLearnedSphericalHarmonics(unittest.TestCase):
         model.add(pythia.learned.spherical_harmonics.ComplexProjection(4, 'abs'))
         model.add(keras.layers.Activation('relu'))
         model.add(keras.layers.Flatten())
+        model.add(keras.layers.BatchNormalization())
         model.add(keras.layers.Dense(num_classes, activation='softmax'))
         model.compile('sgd', 'categorical_crossentropy', metrics=['accuracy'])
 
@@ -52,7 +53,7 @@ class TestLearnedSphericalHarmonics(unittest.TestCase):
 
         train_history = model.fit(
             train_ins, net_train_outs, validation_data=(test_ins, net_train_outs),
-            epochs=200, verbose=0)
+            epochs=100, verbose=0)
 
         self.assertGreater(train_history.history['val_accuracy'][-1], .75)
 
@@ -82,6 +83,7 @@ class TestLearnedSphericalHarmonics(unittest.TestCase):
         model.add(pythia.learned.spherical_harmonics.ComplexProjection(4, 'abs,angle'))
         model.add(keras.layers.Flatten())
         model.add(keras.layers.Activation('relu'))
+        model.add(keras.layers.BatchNormalization())
         model.add(keras.layers.Dense(num_classes, activation='softmax'))
         model.compile('sgd', 'categorical_crossentropy', metrics=['accuracy'])
 
@@ -109,7 +111,7 @@ class TestLearnedSphericalHarmonics(unittest.TestCase):
         for (neighborhood, rsq) in zip(train_ins, rsqs):
             neighborhood[:] = neighborhood[np.argsort(rsq)]
 
-        train_ins, test_ins = train_ins[:train_ins.shape[0]//2], train_ins[train_ins.shape[0]//2:]
+        train_ins, test_ins = train_ins[:num_data], train_ins[num_data:]
         train_outs = np.tile(np.arange(num_classes), num_data//2)
 
         quats = rowan.random.rand(test_ins.shape[0])
@@ -117,12 +119,13 @@ class TestLearnedSphericalHarmonics(unittest.TestCase):
 
         model = keras.models.Sequential()
         model.add(pythia.learned.bonds.InertiaRotation(
-            2, input_shape=train_ins.shape[1:]))
+            4, input_shape=train_ins.shape[1:]))
         model.add(pythia.learned.spherical_harmonics.SphericalHarmonics(2))
         model.add(pythia.learned.spherical_harmonics.NeighborAverage())
         model.add(pythia.learned.spherical_harmonics.ComplexProjection(4, 'abs'))
         model.add(keras.layers.Activation('relu'))
         model.add(keras.layers.Flatten())
+        model.add(keras.layers.BatchNormalization())
         model.add(keras.layers.Dense(num_classes, activation='softmax'))
         model.compile('sgd', 'categorical_crossentropy', metrics=['accuracy'])
 
@@ -130,7 +133,7 @@ class TestLearnedSphericalHarmonics(unittest.TestCase):
 
         train_history = model.fit(
             train_ins, net_train_outs, validation_data=(test_ins, net_train_outs),
-            epochs=200, verbose=0)
+            epochs=100, verbose=0, shuffle=True)
 
         self.assertLess(np.mean(train_history.history['val_accuracy']), .55)
 
