@@ -1,4 +1,4 @@
-import keras
+import tensorflow.keras as keras
 import numpy as np
 import pythia
 import pythia.learned
@@ -8,14 +8,21 @@ import unittest
 
 
 class TestLearnedSphericalHarmonics(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        tf.config.optimizer.set_jit(True)
+        gpus = tf.config.experimental.list_physical_devices('GPU')
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+
     def setUp(self):
         np.random.seed(12)
-        tf.set_random_seed(13)
+        tf.random.set_seed(13)
 
     def test_basic_point_clouds(self):
         classes = [
-            [(-1., 0, 0), (1, 0, 0), (-2, 0, 0), (2, 0, 0)], # line of points
-            [(-1, 0, 0), (1, 0, 0), (0, 1, 0), (0, -1, 0)], # square
+            [(-1., 0, 0), (1, 0, 0), (-2, 0, 0), (2, 0, 0)],  # line of points
+            [(-1, 0, 0), (1, 0, 0), (0, 1, 0), (0, -1, 0)],  # square
         ]
         num_classes = len(classes)
         num_data = 128
@@ -41,18 +48,18 @@ class TestLearnedSphericalHarmonics(unittest.TestCase):
         model.add(keras.layers.Dense(num_classes, activation='softmax'))
         model.compile('sgd', 'categorical_crossentropy', metrics=['accuracy'])
 
-        net_train_outs = keras.utils.np_utils.to_categorical(train_outs, num_classes)
+        net_train_outs = keras.utils.to_categorical(train_outs, num_classes)
 
         train_history = model.fit(
             train_ins, net_train_outs, validation_data=(test_ins, net_train_outs),
             epochs=200, verbose=0)
 
-        self.assertGreater(train_history.history['val_acc'][-1], .75)
+        self.assertGreater(train_history.history['val_accuracy'][-1], .75)
 
     def test_chiral_point_clouds(self):
         classes = [
-            [(0., 0, 0), (1, 0, 0), (0, 2, 0), (0, 0, 3)], # a shape...
-            [(0, 0, 0), (-1, 0, 0), (0, -2, 0), (0, 0, -3)], # and an inversion of that shape
+            [(0., 0, 0), (1, 0, 0), (0, 2, 0), (0, 0, 3)],  # a shape...
+            [(0, 0, 0), (-1, 0, 0), (0, -2, 0), (0, 0, -3)],  # and an inversion of that shape
         ]
         num_classes = len(classes)
         num_data = 128
@@ -78,13 +85,13 @@ class TestLearnedSphericalHarmonics(unittest.TestCase):
         model.add(keras.layers.Dense(num_classes, activation='softmax'))
         model.compile('sgd', 'categorical_crossentropy', metrics=['accuracy'])
 
-        net_train_outs = keras.utils.np_utils.to_categorical(train_outs, num_classes)
+        net_train_outs = keras.utils.to_categorical(train_outs, num_classes)
 
         train_history = model.fit(
             train_ins, net_train_outs, validation_data=(test_ins, net_train_outs),
             epochs=100, verbose=0)
 
-        self.assertGreater(np.max(train_history.history['val_acc']), .75)
+        self.assertGreater(np.max(train_history.history['val_accuracy']), .75)
 
     def test_rotational_invariance(self):
         classes = [
@@ -119,13 +126,13 @@ class TestLearnedSphericalHarmonics(unittest.TestCase):
         model.add(keras.layers.Dense(num_classes, activation='softmax'))
         model.compile('sgd', 'categorical_crossentropy', metrics=['accuracy'])
 
-        net_train_outs = keras.utils.np_utils.to_categorical(train_outs, num_classes)
+        net_train_outs = keras.utils.to_categorical(train_outs, num_classes)
 
         train_history = model.fit(
             train_ins, net_train_outs, validation_data=(test_ins, net_train_outs),
             epochs=200, verbose=0)
 
-        self.assertLess(np.mean(train_history.history['val_acc']), .55)
+        self.assertLess(np.mean(train_history.history['val_accuracy']), .55)
 
 
 if __name__ == '__main__':

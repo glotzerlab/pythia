@@ -1,5 +1,5 @@
-import keras
-import keras.backend as K
+import tensorflow.keras as keras
+import tensorflow.keras.backend as K
 import numpy as np
 import tensorflow as tf
 
@@ -9,8 +9,8 @@ import fsph.tf_ops
 
 def _xyz_to_phitheta(xyz):
     r = tf.linalg.norm(xyz, axis=-1)
-    phi = tf.acos(K.clip(xyz[..., 2]/r, -1, 1))
-    theta = tf.atan2(xyz[..., 1], xyz[..., 0])
+    phi = tf.math.acos(K.clip(xyz[..., 2]/r, -1, 1))
+    theta = tf.math.atan2(xyz[..., 1], xyz[..., 0])
 
     phitheta = K.stack([phi, theta], -1)
     return phitheta
@@ -156,16 +156,19 @@ class ComplexProjection(keras.layers.Layer):
             if conversion == 'abs':
                 result.append(K.abs(self.sph_projected))
             elif conversion == 'angle':
-                result.append(tf.angle(self.sph_projected))
+                result.append(tf.math.angle(self.sph_projected))
             elif conversion == 'real':
-                result.append(tf.real(self.sph_projected))
+                result.append(tf.math.real(self.sph_projected))
             elif conversion == 'imag':
-                result.append(tf.imag(self.sph_projected))
+                result.append(tf.math.imag(self.sph_projected))
             else:
                 raise NotImplementedError('Unknown conversion {}'.format(conversion))
 
         if len(conversions) > 1:
             self.projected = K.stack(result, -1)
+            int_shape = K.int_shape(self.projected)
+            new_shape = [v if v else -1 for v in int_shape[:-2]] + [int_shape[-2]*int_shape[-1]]
+            self.projected = K.reshape(self.projected, new_shape)
         else:
             self.projected = result[0]
 

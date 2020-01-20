@@ -32,7 +32,10 @@ setup(name='pythia-learn',
       license='BSD',
       long_description=long_description,
       package_dir={'pythia': 'pythia'},
-      packages=['pythia'],
+      packages=[
+          'pythia',
+          'pythia.learned',
+      ],
       project_urls={
           'Documentation': 'https://pythia-learn.readthedocs.io/',
           'Source': 'https://github.com/glotzerlab/pythia'

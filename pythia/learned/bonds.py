@@ -1,5 +1,5 @@
-import keras
-import keras.backend as K
+import tensorflow.keras as keras
+import tensorflow.keras.backend as K
 import numpy as np
 import tensorflow as tf
 
@@ -11,7 +11,7 @@ def _custom_eigvecsh(x):
     # for example) and clipping the gradient magnitude
     (evals, evecs) = tf.linalg.eigh(x)
     def grad(dvecs):
-        dvecs = tf.where(tf.is_finite(dvecs), dvecs, tf.zeros_like(dvecs))
+        dvecs = tf.where(tf.math.is_finite(dvecs), dvecs, tf.zeros_like(dvecs))
         dvecs = K.clip(dvecs, -1, 1)
         return dvecs
 
@@ -20,9 +20,9 @@ def _custom_eigvecsh(x):
 
 @tf.custom_gradient
 def _ignore_nan_gradient(x):
-    result = K.identity(x)
+    result = tf.identity(x)
     def grad(dy):
-        dy = tf.where(tf.is_finite(dy), dy, tf.zeros_like(dy))
+        dy = tf.where(tf.math.is_finite(dy), dy, tf.zeros_like(dy))
         return dy
 
     return result, grad
@@ -32,7 +32,7 @@ def _diagonalize(xyz, mass):
     rsq = K.expand_dims(K.sum(xyz**2, axis=-1, keepdims=True), -1)
     # xyz::(..., num_neighbors, 3)
     # f1, f2::(..., num_neighbors, 3, 3)
-    f1 = K.eye(3)*rsq
+    f1 = np.eye(3)*rsq
     f2 = K.expand_dims(xyz, -2)*K.expand_dims(xyz, -1)
     # mass::(..., num_neighbors)
     expanded_mass = K.expand_dims(K.expand_dims(mass, -1), -1)
