@@ -35,7 +35,9 @@ jobs:
             . venv/bin/activate
             pip install -U pip==19
             pip install -U codecov
-            pip install -U -e . -r requirements.txt
+            pip install -U tensorflow
+            pip install -U --no-build-isolation -e . -r requirements.txt
+            pip install -U --no-build-isolation git+https://github.com/glotzerlab/fsph@tensorflow2
 
       - run:
           name: Run tests
