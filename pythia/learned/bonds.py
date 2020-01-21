@@ -10,6 +10,7 @@ def _custom_eigvecsh(x):
     # and infs (nans occur when there are two identical eigenvalues,
     # for example) and clipping the gradient magnitude
     (evals, evecs) = tf.linalg.eigh(x)
+
     def grad(dvecs):
         dvecs = tf.where(tf.math.is_finite(dvecs), dvecs, tf.zeros_like(dvecs))
         dvecs = K.clip(dvecs, -1, 1)
@@ -21,6 +22,7 @@ def _custom_eigvecsh(x):
 @tf.custom_gradient
 def _ignore_nan_gradient(x):
     result = tf.identity(x)
+
     def grad(dy):
         dy = tf.where(tf.math.is_finite(dy), dy, tf.zeros_like(dy))
         return dy
@@ -75,7 +77,7 @@ class InertiaRotation(keras.layers.Layer):
     :param num_rotations: number of rotations to produce
     :param initial_mass_variance: Variance of the initial mass distribution (mean 1)
     :param center: Center the mass points before computing the inertia tensor (see description above)
-    """
+    """ # noqa
     def __init__(self, num_rotations=1, initial_mass_variance=.25,
                  center=False, **kwargs):
         self.num_rotations = num_rotations
@@ -83,8 +85,8 @@ class InertiaRotation(keras.layers.Layer):
 
         if center not in (False, True, 'com'):
             msg = ('Center argument {} must be a bool or "com" (to '
-                'center using the mass stored in this layer)'.format(center))
-            raise ArgumentError(msg)
+                'center using the mass stored in this layer)'.format(center)) # noqa
+            raise ValueError(msg)
 
         self.center = center
 

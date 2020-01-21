@@ -26,7 +26,7 @@ class SphericalHarmonics(keras.layers.Layer):
 
     :param lmax: maximum spherical harmonic degree to compute
     :param negative_m: If True, consider m=-l to m=l for each spherical harmonic l; otherwise, consider m=0 to m=l
-    """
+    """ # noqa
     def __init__(self, lmax, negative_m=False, **kwargs):
         self.lmax = int(lmax)
         self.negative_m = bool(negative_m)
@@ -72,7 +72,7 @@ class NeighborAverage(keras.layers.Layer):
     num_sphs)`, `NeighborAverage` will produce an output of shape
     `(..., num_rotations, num_sphs)`. Each neighbor from each rotation
     is assigned a learnable weight to contribute to the sum.
-    """
+    """ # noqa
     def build(self, input_shape):
         # (rotations, neighbors)
         shape = (input_shape[-3], input_shape[-2],)
@@ -114,7 +114,7 @@ class ComplexProjection(keras.layers.Layer):
     :param activation: Keras activation function for the layer
     :param kernel_initializer: Keras initializer for the projection weights matrix
     :param bias_initializer: Keras initializer for the projection bias matrix
-    """
+    """ # noqa
     def __init__(self, num_projections=1, conversion='abs', activation=None,
                  kernel_initializer='glorot_uniform',
                  bias_initializer='random_normal', **kwargs):
@@ -201,7 +201,7 @@ class ComplexDropout(keras.layers.Dropout):
     floating-point values. Interface is identical to
     :py:class:`keras.layers.Dropout`.
 
-    """
+    """ # noqa
     def _get_noise_shape(self, inputs):
         if self.noise_shape is None:
             noise_shape = K.int_shape(inputs)
