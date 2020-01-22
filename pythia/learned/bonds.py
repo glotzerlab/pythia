@@ -90,21 +90,22 @@ class InertiaRotation(keras.layers.Layer):
 
         self.center = center
 
-        super(InertiaRotation, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def build(self, input_shape):
         mass_shape = [self.num_rotations] + list(input_shape[-2:-1])
 
         self.mass = self.add_weight(
-            'mass', mass_shape,
+            'mass', mass_shape, trainable=True,
             initializer=keras.initializers.RandomNormal(1., self.initial_mass_variance),
             constraint=keras.constraints.NonNeg())
-        self.mass = self.mass/K.sum(self.mass, -1, keepdims=True)
-        self.mass = _ignore_nan_gradient(self.mass)
 
-        super(InertiaRotation, self).build(input_shape)
+        super().build(input_shape)
 
     def call(self, neighborhood_xyz):
+        norm_mass = self.mass/K.sum(self.mass, -1, keepdims=True)
+        norm_mass = _ignore_nan_gradient(norm_mass)
+
         # neighborhood_xyz: (..., num_neighbors, 3) -> (..., num_rotations, num_neighbors, 3)
         repeats = np.ones(len(neighborhood_xyz.shape) + 1)
         repeats[-3] = self.num_rotations
@@ -113,13 +114,13 @@ class InertiaRotation(keras.layers.Layer):
         if self.center == 'com':
             # mass for each neighborhood is already normalized to sum to 1
             center_of_mass = K.sum(
-                neighborhood_xyz*K.expand_dims(self.mass, -1), -2, keepdims=True)
+                neighborhood_xyz*K.expand_dims(norm_mass, -1), -2, keepdims=True)
             neighborhood_xyz = neighborhood_xyz - center_of_mass
         elif self.center:
             neighborhood_xyz = neighborhood_xyz - K.mean(neighborhood_xyz, -2, keepdims=True)
 
         (self.diagonal_xyz, self.inertia_tensors, self.rotations) = \
-            _diagonalize(neighborhood_xyz, self.mass)
+            _diagonalize(neighborhood_xyz, norm_mass)
         return self.diagonal_xyz
 
     def compute_output_shape(self, input_shape):

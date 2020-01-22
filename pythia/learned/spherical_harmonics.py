@@ -33,11 +33,11 @@ class SphericalHarmonics(keras.layers.Layer):
 
         self.num_sphs = len(fsph.get_LMs(self.lmax, self.negative_m))
 
-        super(SphericalHarmonics, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def build(self, input_shape):
         assert input_shape[-1] == 3, 'SphericalHarmonics must take an array of (x, y, z) values'
-        super(SphericalHarmonics, self).build(input_shape)
+        super().build(input_shape)
 
     def call(self, xyz):
         self.diagonal_phitheta = _xyz_to_phitheta(xyz)
@@ -78,17 +78,20 @@ class NeighborAverage(keras.layers.Layer):
         shape = (input_shape[-3], input_shape[-2],)
         weight_scale = 1.0/input_shape[-2]
         self.neighbor_weights = self.add_weight(
-            'neighbor_weights', shape,
+            'neighbor_weights', shape, trainable=True,
             initializer=keras.initializers.RandomUniform(-weight_scale, weight_scale))
-        self.neighbor_weights = K.expand_dims(self.neighbor_weights, -1)
 
-        for _ in range(self.neighbor_weights.shape.ndims, len(input_shape)):
-            self.neighbor_weights = K.expand_dims(self.neighbor_weights, 0)
+        self.times_to_expand = len(input_shape) - 3
 
-        super(NeighborAverage, self).build(input_shape)
+        super().build(input_shape)
 
     def call(self, inputs):
-        self.neighbor_sum = K.sum(inputs*K.cast(self.neighbor_weights, tf.complex64), -2)
+        neighbor_weights_expanded = K.expand_dims(self.neighbor_weights, -1)
+
+        for _ in range(self.times_to_expand):
+            neighbor_weights_expanded = K.expand_dims(neighbor_weights_expanded, 0)
+
+        self.neighbor_sum = K.sum(inputs*K.cast(neighbor_weights_expanded, tf.complex64), -2)
         return self.neighbor_sum
 
     def compute_output_shape(self, input_shape):
@@ -124,25 +127,25 @@ class ComplexProjection(keras.layers.Layer):
         self.kernel_initializer = kernel_initializer
         self.bias_initializer = bias_initializer
 
-        super(ComplexProjection, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def build(self, input_shape):
         # (rotations, spherical_harmonics, projections)
         shape = (input_shape[-2], input_shape[-1], self.num_projections)
         self.projection = self.add_weight(
-            'projection', shape,
+            'projection', shape, trainable=True,
             initializer=keras.initializers.get(self.kernel_initializer))
         num_conversions = len(self.conversion.split(','))
         # (rotations, projections*conversions)
         bias_shape = (input_shape[-2], self.num_projections*num_conversions)
         self.bias = self.add_weight(
-            'bias', bias_shape,
+            'bias', bias_shape, trainable=True,
             initializer=keras.initializers.get(self.bias_initializer))
 
         for _ in range(len(shape), len(input_shape)):
             self.projection = K.expand_dims(self.projection, 0)
 
-        super(ComplexProjection, self).build(input_shape)
+        super().build(input_shape)
 
     def call(self, inputs):
         # inputs::(..., rotations, spherical_harmonics)
