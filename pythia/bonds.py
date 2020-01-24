@@ -27,14 +27,14 @@ def normalized_radial_distance(box, positions, neighbors, rmax_guess=2.):
     """
     fbox = freud.box.Box.from_box(box)
 
-    neighbors = _nlist_nn_helper(fbox, positions, neighbors, rmax_guess, True)
+    nlist = _nlist_nn_helper(fbox, positions, neighbors, rmax_guess, True)
 
-    rijs = positions[neighbors.point_indices] - positions[neighbors.query_point_indices]
-    fbox.wrap(rijs)
+    rijs = positions[nlist.point_indices] - positions[nlist.query_point_indices]
+    rijs = fbox.wrap(rijs)
 
     rs = np.linalg.norm(rijs, axis=-1)
-    reference_rs = rs[neighbors.segments]
-    normalization = np.repeat(reference_rs, neighbors.neighbor_counts)
+    reference_rs = rs[nlist.segments]
+    normalization = np.repeat(reference_rs, nlist.neighbor_counts)
     rs /= normalization
 
     # skip the shortest bond since that gets normalized down to 1
@@ -47,14 +47,15 @@ def _get_neighborhood_distance_matrix(box, positions, neighbors, rmax_guess=2.):
     """
     fbox = freud.box.Box.from_box(box)
 
-    neighbors = _nlist_nn_helper(fbox, positions, neighbors, rmax_guess, True)
+    nlist = _nlist_nn_helper(fbox, positions, neighbors, rmax_guess, True)
 
-    neighbor_indices = neighbors.point_indices.reshape((positions.shape[0], -1))
+    neighbor_indices = nlist.point_indices.reshape((positions.shape[0], -1))
 
     # (Np, Nn, Nn, 3) distance matrix
     rijs = positions[neighbor_indices[:, :, np.newaxis]] - \
         positions[neighbor_indices[:, np.newaxis, :]]
-    fbox.wrap(rijs.reshape((-1, 3)))
+    rijs = fbox.wrap(rijs.reshape((-1, 3))).reshape(
+        (len(positions), neighbors, neighbors, 3))
 
     # (Np, Nn, Nn) distance matrix
     rs = np.linalg.norm(rijs, axis=-1)
@@ -110,13 +111,14 @@ def _get_neighborhood_angle_matrix(box, positions, neighbors, rmax_guess=2.):
     """
     fbox = freud.box.Box.from_box(box)
 
-    neighbors = _nlist_nn_helper(fbox, positions, neighbors, rmax_guess, True)
+    nlist = _nlist_nn_helper(fbox, positions, neighbors, rmax_guess, True)
 
-    neighbor_indices = neighbors.point_indices.reshape((positions.shape[0], -1))
+    neighbor_indices = nlist.point_indices.reshape((positions.shape[0], -1))
 
     # (Np, Nn, 3) distance matrix
     rijs = positions[neighbor_indices] - positions[:, np.newaxis, :]
-    fbox.wrap(rijs.reshape((-1, 3)))
+    rijs = fbox.wrap(rijs.reshape((-1, 3))).reshape(
+        (len(positions), neighbors, 3))
 
     # (Np, Nn) distances
     rs = np.linalg.norm(rijs, axis=-1)

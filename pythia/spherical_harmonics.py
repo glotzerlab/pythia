@@ -54,7 +54,7 @@ def neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
         for _ in range(noise_samples):
             noise = np.random.normal(0, noise_magnitude, positions.shape)
             noisy_positions = positions + noise
-            freud_box.wrap(noisy_positions)
+            noisy_positions = freud_box.wrap(noisy_positions)
             noisy_descriptors = neighbor_average(
                 box, noisy_positions, neigh_min, neigh_max, lmax, negative_m,
                 reference_frame, orientations, rmax_guess, 0, 0)
@@ -227,7 +227,7 @@ def bispectrum(box, positions, neighbors, lmax, rmax_guess=2.):
     nlist = _nlist_helper(box, positions, neighbors, rmax_guess)
 
     rijs = positions[nlist.point_indices] - positions[nlist.query_point_indices]
-    box.wrap(rijs)
+    rijs = box.wrap(rijs)
 
     phi = np.arccos(rijs[..., 2]/np.sqrt(np.sum(rijs**2, axis=-1)))
     theta = np.arctan2(rijs[..., 1], rijs[..., 0])
