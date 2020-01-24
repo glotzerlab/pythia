@@ -15,7 +15,7 @@ def _nlist_nn_helper(fbox, positions, neighbors, rmax_guess, exclude_ii=True):
         result = aq.query(positions, {'num_neighbors': neighbors,
                                       'r_guess': rmax_guess,
                                       'exclude_ii': exclude_ii})
-        neighbors = result.toNeighborList()
+        neighbors = result.toNeighborList(sort_by_distance=True)
 
     return neighbors
 

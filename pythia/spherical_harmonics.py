@@ -18,11 +18,11 @@ def _nlist_helper(fbox, positions, neighbors, exclude_ii=None):
     if isinstance(neighbors, int):
         aq = freud.AABBQuery(fbox, positions)
         result = aq.query(positions, {'num_neighbors': neighbors, 'exclude_ii': exclude_ii})
-        neighbors = result.toNeighborList()
+        neighbors = result.toNeighborList(sort_by_distance=True)
     elif isinstance(neighbors, float):
         aq = freud.AABBQuery(fbox, positions)
         result = aq.query(positions, {'r_max': neighbors, 'exclude_ii': exclude_ii})
-        neighbors = result.toNeighborList()
+        neighbors = result.toNeighborList(sort_by_distance=True)
 
     return neighbors
 
@@ -84,7 +84,8 @@ def neighbor_average(box, positions, neigh_min=4, neigh_max=4, lmax=4,
 
     for nNeigh in range(neigh_min, neigh_max + 1):
         # sphs::(Nbond, Nsph)
-        comp.compute((freud_box, positions), orientations=orientations, neighbors=nlist)
+        comp.compute((freud_box, positions), orientations=orientations,
+                     neighbors=nlist, max_num_neighbors=nNeigh)
         sphs = comp.sph
 
         # average over neighbors
