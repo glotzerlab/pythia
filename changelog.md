@@ -1,3 +1,8 @@
+## v0.3.0 - 2020/02/26
+
+- Bugfix: Update to freud 2.0, require freud >= 2.2 and fix ordering of neighbor lists (mspells)
+- Feature: `pythia.learned` learnable representations and keras layers API (mspells)
+
 ## v0.2.5
 
 - Bugfix: fix rotational invariance of bispectrum descriptors (csadorf,mspells)

@@ -24,10 +24,13 @@ setup(name='pythia-learn',
           'Topic :: Scientific/Engineering :: Physics'
       ],
       description='Machine learning fingerprints for particle environments',
+      extras_require={
+          'learned': ['tensorflow', 'fsph >= 0.2'],
+      },
       install_requires=[
+          'freud-analysis>=2.2.0',
           'numpy',
           'scipy',
-          'freud-analysis>=2.0',
       ],
       license='BSD',
       long_description=long_description,

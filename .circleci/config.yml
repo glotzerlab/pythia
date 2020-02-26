@@ -37,7 +37,7 @@ jobs:
             pip install -U codecov
             pip install -U tensorflow
             pip install -U --no-build-isolation -e . -r requirements.txt
-            pip install -U --no-build-isolation git+https://github.com/glotzerlab/fsph@tensorflow2
+            pip install -U --no-build-isolation fsph
 
       - run:
           name: Run tests
