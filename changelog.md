@@ -1,6 +1,7 @@
 ## v0.3.0 - 2020/02/26
 
 - Bugfix: Update to freud 2.0, require freud >= 2.2 and fix ordering of neighbor lists (mspells)
+- Bugfix: Fix NaN's in bond `neighborhood_angle_matrix` (yzjin,bdice)
 - Feature: `pythia.learned` learnable representations and keras layers API (mspells)
 
 ## v0.2.5
