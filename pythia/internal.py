@@ -53,6 +53,19 @@ all_citations['spellings2018'] = """
 }
 """
 
+all_citations['mickel2013'] = """
+@article{mickel2013,
+        title = {Shortcomings of the bond orientational order parameters for the analysis of disordered particulate matter},
+        author = {Mickel, Walter and Kapfer, Sebastian C. and Schr{\"{o}}der-Turk, Gerd E. and Mecke, Klaus},
+        year = 2013,
+        journal = {Journal of Chemical Physics},
+        volume = 138,
+        number = 4,
+        doi = {10.1063/1.4774084},
+        issn = {00219606}
+}
+"""  # noqa E501
+
 
 def _cite(f, extra_doc):
     if f.__doc__ is None:
